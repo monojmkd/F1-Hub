@@ -1,4 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
+import Rankings from "./Rankings";
+import AutoRaceStats from "./AutoRaceStats";
+import UpcomingRaces from "./UpcomingRaces";
+import LiveStream from "./LiveStream";
 
 export default function Home() {
   const [soundOn, setSoundOn] = useState(false);
@@ -62,23 +66,28 @@ export default function Home() {
     return () => track.removeEventListener("wheel", onWheel);
   }, []);
 
-  useEffect(() => {
-    const hero = heroRef.current;
-    if (!hero) return;
-    const onEnter = () => playEngineRev();
-    const onClick = () => playEngineRev();
-    hero.addEventListener("mouseenter", onEnter);
-    hero.addEventListener("click", onClick);
-    return () => {
-      hero.removeEventListener("mouseenter", onEnter);
-      hero.removeEventListener("click", onClick);
-    };
-  }, [soundOn]);
+  //   useEffect(() => {
+  //     const hero = heroRef.current;
+  //     if (!hero) return;
+  //     const onEnter = () => playEngineRev();
+  //     const onClick = () => playEngineRev();
+  //     hero.addEventListener("mouseenter", onEnter);
+  //     hero.addEventListener("click", onClick);
+  //     return () => {
+  //       hero.removeEventListener("mouseenter", onEnter);
+  //       hero.removeEventListener("click", onClick);
+  //     };
+  //   }, [soundOn]);
 
   return (
     <div>
       {/* Hero */}
-      <section id="home" className="hero" ref={heroRef}>
+      <section
+        id="home"
+        className="hero"
+        ref={heroRef}
+        style={{ marginBottom: "2%" }}
+      >
         <div className="slideshow">
           {/* Replace with your images */}
           <div
@@ -120,80 +129,15 @@ export default function Home() {
       </section>
 
       {/* Rankings */}
-      <section id="rankings" className="container">
-        <h2 className="section-title">Driver Rankings</h2>
-        <p className="subtle">
-          Table-style layout with alternating red/black glass rows. Replace with
-          dynamic data later.
-        </p>
-        <div className="panel rankings fade-in">
-          <table className="table" aria-label="F1 Driver Rankings">
-            <thead>
-              <tr>
-                <th>Position</th>
-                <th>Driver</th>
-                <th>Team</th>
-                <th>Points</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <span className="badge">1</span>
-                </td>
-                <td>Max Placeholder</td>
-                <td>Red Bull Placeholder</td>
-                <td>402</td>
-              </tr>
-              <tr>
-                <td>
-                  <span className="badge">2</span>
-                </td>
-                <td>Lewis Placeholder</td>
-                <td>Mercedes Placeholder</td>
-                <td>366</td>
-              </tr>
-              <tr>
-                <td>
-                  <span className="badge">3</span>
-                </td>
-                <td>Charles Placeholder</td>
-                <td>Ferrari Placeholder</td>
-                <td>312</td>
-              </tr>
-              <tr>
-                <td>
-                  <span className="badge">4</span>
-                </td>
-                <td>Lando Placeholder</td>
-                <td>McLaren Placeholder</td>
-                <td>280</td>
-              </tr>
-              <tr>
-                <td>
-                  <span className="badge">5</span>
-                </td>
-                <td>Fernando Placeholder</td>
-                <td>Aston Martin Placeholder</td>
-                <td>210</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
+      <Rankings />
       {/* Live Stream */}
-      <section id="live" className="container">
-        <h2 className="section-title">Live Stream</h2>
-        <p className="subtle">
-          Embed your player in the black‑bordered area. Right panel shows lap
-          count, race stats, and top 5 in real time.
-        </p>
+      <section
+        id="live"
+        className="container"
+        style={{ display: "grid", alignContent: "center", marginTop: "2%" }}
+      >
+        <LiveStream />
         <div className="live-grid fade-in">
-          <div
-            className="player"
-            aria-label="Live streaming player placeholder"
-          ></div>
           <div className="server-switch">
             <button className="btn btn-red server-btn">Server 1</button>
             <button className="btn btn-dark server-btn">Server 2</button>
@@ -204,93 +148,27 @@ export default function Home() {
               <option>Server 3</option>
             </select>
           </div>
-          <aside className="stats" aria-label="Live race stats">
-            <h4>Race Stats</h4>
-            <div className="stat-grid">
-              <div className="stat">
-                <div>Lap</div>
-                <strong>36 / 58</strong>
-              </div>
-              <div className="stat">
-                <div>Track Temp</div>
-                <strong>44°C</strong>
-              </div>
-              <div className="stat">
-                <div>Safety Car</div>
-                <strong>No</strong>
-              </div>
-              <div className="stat">
-                <div>DRS</div>
-                <strong>Enabled</strong>
-              </div>
-            </div>
-            <h4>Top 5</h4>
-            <ol className="top5">
-              <li>
-                <span>1. Max Placeholder</span> <strong>— +0.0s</strong>
-              </li>
-              <li>
-                <span>2. Charles Placeholder</span> <strong>— +1.2s</strong>
-              </li>
-              <li>
-                <span>3. Lando Placeholder</span> <strong>— +2.9s</strong>
-              </li>
-              <li>
-                <span>4. Lewis Placeholder</span> <strong>— +5.1s</strong>
-              </li>
-              <li>
-                <span>5. Fernando Placeholder</span> <strong>— +7.6s</strong>
-              </li>
-            </ol>
-          </aside>
         </div>
+      </section>
+      <section
+        id="live"
+        className="container"
+        style={{ marginTop: "2%", paddingLeft: "15%", paddingRight: "15%" }}
+      >
+        <AutoRaceStats year={2025} />
       </section>
 
       {/* Schedule */}
-      <section id="schedule" className="container">
-        <h2 className="section-title">Upcoming Races</h2>
-        <p className="subtle">
-          Grid cards with circuit image placeholder and date/time. Red hover
-          glow effect.
-        </p>
-        <div className="cards fade-in">
-          <article className="card">
-            <div className="thumb"></div>
-            <div className="body">
-              <div className="badge-red">Round 1</div>
-              <h3 style={{ margin: "10px 0 6px" }}>Bahrain Grand Prix</h3>
-              <div style={{ opacity: 0.85 }}>Sakhir | Sun, 20:30 IST</div>
-            </div>
-          </article>
-          <article className="card">
-            <div className="thumb"></div>
-            <div className="body">
-              <div className="badge-red">Round 2</div>
-              <h3 style={{ margin: "10px 0 6px" }}>Saudi Arabian Grand Prix</h3>
-              <div style={{ opacity: 0.85 }}>Jeddah | Sat, 22:00 IST</div>
-            </div>
-          </article>
-          <article className="card">
-            <div className="thumb"></div>
-            <div className="body">
-              <div className="badge-red">Round 3</div>
-              <h3 style={{ margin: "10px 0 6px" }}>Australian Grand Prix</h3>
-              <div style={{ opacity: 0.85 }}>Melbourne | Sun, 05:30 IST</div>
-            </div>
-          </article>
-          <article className="card">
-            <div className="thumb"></div>
-            <div className="body">
-              <div className="badge-red">Round 4</div>
-              <h3 style={{ margin: "10px 0 6px" }}>Japanese Grand Prix</h3>
-              <div style={{ opacity: 0.85 }}>Suzuka | Sun, 08:30 IST</div>
-            </div>
-          </article>
-        </div>
+      <section id="schedule" className="container" style={{ marginTop: "2%" }}>
+        <UpcomingRaces />
       </section>
 
       {/* Highlights */}
-      <section id="highlights" className="container">
+      <section
+        id="highlights"
+        className="container"
+        style={{ marginTop: "2%" }}
+      >
         <h2 className="section-title">Highlights</h2>
         <p className="subtle">
           Scroll‑snap carousel with recap thumbnails and minimal play icon.
