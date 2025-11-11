@@ -1,9 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./Home.jsx";
-import Races from "./Races.jsx";
-import { Header } from "./Header.jsx";
-import RaceResults from "./RaceResults.jsx";
-import { Footer } from "./Footer.jsx";
+import Races from "./Components/Races.jsx";
+import { Header } from "./Components/Header.jsx";
+import RaceResults from "./Components/RaceResults.jsx";
+import { Footer } from "./Components/Footer.jsx";
 
 export default function App() {
   return (

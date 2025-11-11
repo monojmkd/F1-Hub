@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import Rankings from "./Rankings";
-import AutoRaceStats from "./AutoRaceStats";
-import UpcomingRaces from "./UpcomingRaces";
-import LiveStream from "./LiveStream";
+import Rankings from "./Components/Rankings";
+import AutoRaceStats from "./Components/AutoRaceStats";
+import UpcomingRaces from "./Components/UpcomingRaces";
+import LiveStream from "./Components/LiveStream";
+import Highlights from "./Components/Highlights";
 
 export default function Home() {
   const [soundOn, setSoundOn] = useState(false);
@@ -139,7 +140,7 @@ export default function Home() {
         <LiveStream />
       </section>
       <section
-        id="live"
+        id="stats"
         className="container"
         style={{ marginTop: "2%", paddingLeft: "15%", paddingRight: "15%" }}
       >
@@ -152,55 +153,8 @@ export default function Home() {
       </section>
 
       {/* Highlights */}
-      <section
-        id="highlights"
-        className="container"
-        style={{ marginTop: "2%" }}
-      >
-        <h2 className="section-title">Highlights</h2>
-        <p className="subtle">
-          Scroll‑snap carousel with recap thumbnails and minimal play icon.
-        </p>
-        <div className="carousel fade-in">
-          <div className="track" id="carouselTrack" ref={trackRef}>
-            <article className="slide-card">
-              <div className="thumb">
-                <span className="play" aria-hidden="true"></span>
-              </div>
-              <div className="body">
-                <strong>Race Recap — Monza</strong>
-                <div style={{ opacity: 0.85 }}>3:42</div>
-              </div>
-            </article>
-            <article className="slide-card">
-              <div className="thumb">
-                <span className="play" aria-hidden="true"></span>
-              </div>
-              <div className="body">
-                <strong>Last‑lap Drama — Silverstone</strong>
-                <div style={{ opacity: 0.85 }}>5:01</div>
-              </div>
-            </article>
-            <article className="slide-card">
-              <div className="thumb">
-                <span className="play" aria-hidden="true"></span>
-              </div>
-              <div className="body">
-                <strong>Under the Lights — Singapore</strong>
-                <div style={{ opacity: 0.85 }}>4:15</div>
-              </div>
-            </article>
-            <article className="slide-card">
-              <div className="thumb">
-                <span className="play" aria-hidden="true"></span>
-              </div>
-              <div className="body">
-                <strong>Wheel‑to‑Wheel — Austin</strong>
-                <div style={{ opacity: 0.85 }}>2:58</div>
-              </div>
-            </article>
-          </div>
-        </div>
+      <section style={{ marginTop: "2%" }}>
+        <Highlights />
       </section>
     </div>
   );
