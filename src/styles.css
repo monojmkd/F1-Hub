@@ -402,8 +402,8 @@ section {
 .player-wrapper {
   position: relative;
   width: 100%;
-  max-width: 1400px; /* increased player size */
-  aspect-ratio: 16/7.5;
+  max-width: 900px; /* increased player size */
+  aspect-ratio: 16/8.5;
   border: 2px solid #000;
   border-radius: 16px;
   overflow: hidden;
@@ -412,12 +412,12 @@ section {
 }
 
 .player-wrapper iframe {
-  position: absolute;
-  inset: 0;
+  /* position: absolute;
+  inset: 0; */
   width: 100%;
   height: 100%;
   border: none;
-  /* object-fit: cover; */
+  display: block;
 }
 
 .player::after {
@@ -427,12 +427,12 @@ section {
 .click-blocker {
   position: absolute;
   inset: 0;
-  z-index: 20;
+  z-index: 10;
   background: transparent; /* invisible */
 }
 
 .toggle-lock-btn {
-  margin: 10px auto 0;
+  padding: 12px 28px;
   display: block;
   background: var(--red);
   color: white;
@@ -448,6 +448,76 @@ section {
   opacity: 0.8;
 }
 
+.server-switch {
+  flex-wrap: wrap;
+  /* margin-top: 20px; */
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.server-btn {
+  background: #222;
+  padding: 10px 18px;
+  border-radius: 10px;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+  min-width: 100px;
+}
+
+.server-btn.active {
+  background: var(--red);
+  color: white;
+}
+
+.server-btn:hover {
+  opacity: 0.8;
+}
+.server-dropdown {
+  display: none;
+  padding: 10px;
+  background: var(--black);
+  color: var(--white);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+/* ✅ RESPONSIVE FIXES */
+@media (max-width: 900px) {
+  .player-wrapper {
+    aspect-ratio: 16/10; /* slightly taller */
+  }
+}
+
+@media (max-width: 600px) {
+  .player-wrapper {
+    aspect-ratio: 16/20;
+    height: 100vw;
+  }
+
+  .lock-btn {
+    width: 90%;
+    max-width: 280px;
+  }
+
+  .server-btn {
+    width: 45%;
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 400px) {
+  .player-wrapper {
+    aspect-ratio: 16/13;
+  }
+
+  .server-btn {
+    width: 100%;
+  }
+}
+/* Stats */
 .stats {
   padding: 14px;
   border-radius: 16px;
@@ -739,48 +809,5 @@ footer {
   .menu-btn {
     display: inline-grid;
     place-items: center;
-  }
-}
-
-.server-switch {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-}
-
-.server-btn {
-  background: #222;
-  padding: 10px 18px;
-  border-radius: 10px;
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-.server-btn.active {
-  background: var(--red);
-  color: white;
-}
-
-.server-btn:hover {
-  opacity: 0.8;
-}
-.server-dropdown {
-  display: none;
-  padding: 10px;
-  background: var(--black);
-  color: var(--white);
-  border-radius: 10px;
-  border: 1px solid var(--border);
-}
-@media (max-width: 700px) {
-  .server-btn {
-    display: none;
-  }
-  .server-dropdown {
-    display: block;
   }
 }
