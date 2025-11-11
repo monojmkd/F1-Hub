@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
-
 export const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -9,7 +8,7 @@ export const Header = () => {
     <div className="topbar">
       <header className="container flex space">
         <div className="brand">
-          <div className="logo"></div>
+          <img className="logo" src="/f1.png" alt="F1 Logo" />
           <div className="brand-title">Formula One Hub</div>
         </div>
 

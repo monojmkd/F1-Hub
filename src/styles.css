@@ -95,15 +95,11 @@ header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 0;
+  /* padding: 5px 0; */
 }
 .logo {
-  width: 44px;
-  height: 28px;
-  background: linear-gradient(90deg, var(--red), #ff3a2f);
-  clip-path: polygon(0 0, 100% 0, 84% 100%, 0% 100%);
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.2),
-    0 6px 14px rgba(225, 6, 0, 0.35);
+  width: 65px;
+  height: auto;
 }
 .brand-title {
   font-family: "Orbitron", sans-serif;
@@ -166,6 +162,7 @@ nav a:hover {
   position: relative;
   min-height: 66vh;
   overflow: hidden;
+  padding: 0 10px 0 22px;
 }
 .slideshow {
   position: absolute;
@@ -288,6 +285,7 @@ section {
   text-transform: uppercase;
   letter-spacing: 1.4px;
   margin: 0 0 18px;
+  text-align: center;
 }
 .subtle {
   color: #c9cbd1;
@@ -390,28 +388,44 @@ section {
   opacity: 0.9;
 }
 /* Live Stream */
-.live-grid {
-  display: grid;
-  grid-template-columns: 1.3fr 0.7fr;
-  gap: 18px;
+.live-section {
+  padding: 56px 0;
 }
-.player {
+.live-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+}
+
+.player-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1400px; /* increased player size */
   aspect-ratio: 16/9;
   border: 2px solid #000;
   border-radius: 16px;
-  background: linear-gradient(180deg, #0b0b0d, #070708);
-  display: grid;
-  place-items: center;
-  position: relative;
   overflow: hidden;
+  background: linear-gradient(180deg, #0b0b0d, #070708);
   box-shadow: var(--shadow);
 }
+
+.player-wrapper iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
 .player::after {
-  content: "Live Player Placeholder";
+  display: none !important;
+  /* content: "Live Player Placeholder";
   color: #888;
   letter-spacing: 0.8px;
   font-weight: 700;
-  text-transform: uppercase;
+  text-transform: uppercase; */
 }
 .stats {
   padding: 14px;
@@ -456,12 +470,14 @@ section {
 }
 .upcoming-section {
   padding: 20px 0;
+  text-align: center;
 }
 
 .upcoming-list {
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .upcoming-card {
