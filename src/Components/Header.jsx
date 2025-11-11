@@ -7,11 +7,12 @@ export const Header = () => {
   return (
     <div className="topbar">
       <header className="container flex space">
-        <div className="brand">
-          <img className="logo" src="/f1.png" alt="F1 Logo" />
-          <div className="brand-title">Formula One Hub</div>
-        </div>
-
+        <Link to="/">
+          <div className="brand">
+            <img className="logo" src="/f1.png" alt="F1 Logo" />
+            <div className="brand-title">Formula One Hub</div>
+          </div>
+        </Link>
         <nav className="flex">
           <button className="menu-btn" onClick={() => setMenuOpen((v) => !v)}>
             {/* burger icon */}

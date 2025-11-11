@@ -427,6 +427,31 @@ section {
   font-weight: 700;
   text-transform: uppercase; */
 }
+
+.click-blocker {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: transparent; /* invisible */
+}
+
+.toggle-lock-btn {
+  margin: 20px auto 0;
+  display: block;
+  background: var(--red);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s ease;
+}
+
+.toggle-lock-btn:hover {
+  opacity: 0.8;
+}
+
 .stats {
   padding: 14px;
   border-radius: 16px;
