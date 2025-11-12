@@ -175,17 +175,26 @@ nav a:hover {
   background-size: cover;
   background-position: center;
   opacity: 0;
-  animation: slideShow 24s infinite;
+  animation: slideShow 30s infinite;
   filter: brightness(0.8);
 }
 .slide:nth-child(1) {
   animation-delay: 0s;
 }
 .slide:nth-child(2) {
-  animation-delay: 8s;
+  animation-delay: 5s;
 }
 .slide:nth-child(3) {
-  animation-delay: 16s;
+  animation-delay: 10s;
+}
+.slide:nth-child(4) {
+  animation-delay: 15s;
+}
+.slide:nth-child(5) {
+  animation-delay: 20s;
+}
+.slide:nth-child(6) {
+  animation-delay: 25s;
 }
 .smoke-overlay {
   position: absolute;
@@ -195,21 +204,21 @@ nav a:hover {
   opacity: 0.35;
   mix-blend-mode: screen;
   pointer-events: none;
-  animation: drift 20s linear infinite;
+  animation: drift 30s linear infinite;
 }
 @keyframes slideShow {
   0% {
     opacity: 0;
     transform: scale(1.08);
   }
-  8% {
+  5% {
     opacity: 1;
     transform: scale(1);
   }
-  33% {
+  16.66% {
     opacity: 1;
   }
-  41% {
+  21.66% {
     opacity: 0;
   }
   100% {
@@ -388,133 +397,147 @@ section {
   opacity: 0.9;
 }
 /* Live Stream */
+/* Live Stream - predictable responsive heights (no aspect-ratio reliance) */
 .live-section {
-  padding: 56px 0;
-}
-.live-center {
+  padding: 28px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  width: 100%;
 }
 
+.live-container {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+/* The wrapper uses explicit viewport height values so embedded players
+   can't alter parent height. Two modes available: iframeTall and hlsNormal. */
 .player-wrapper {
   position: relative;
   width: 100%;
-  max-width: 900px; /* increased player size */
-  aspect-ratio: 16/8.5;
-  border: 2px solid #000;
-  border-radius: 16px;
+  max-width: 1100px;
+  border-radius: 12px;
+  border: 2px solid rgb(78, 0, 0);
   overflow: hidden;
-  background: linear-gradient(180deg, #0b0b0d, #070708);
-  box-shadow: var(--shadow);
+  background: #000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: height 220ms ease, max-height 220ms ease;
 }
 
-.player-wrapper iframe {
-  /* position: absolute;
-  inset: 0; */
+/* HLS/native video: slightly shorter, widescreen */
+.player-wrapper.hlsNormal {
+  height: min(56vh, 640px);
+  max-height: 720px;
+}
+
+/* Iframe providers: taller container (fixes embeds that render larger controls) */
+.player-wrapper.iframeTall {
+  height: min(72vh, 900px);
+  max-height: 1100px;
+}
+
+/* video / iframe full-fill */
+.live-player,
+.live-iframe {
   width: 100%;
   height: 100%;
-  border: none;
+  border: 0;
   display: block;
 }
 
-.player::after {
-  display: none !important;
-}
-
+/* Click blocker overlay (prevents popups) */
 .click-blocker {
   position: absolute;
   inset: 0;
-  z-index: 10;
-  background: transparent; /* invisible */
+  z-index: 30;
+  background: rgba(0, 0, 0, 0);
 }
 
-.toggle-lock-btn {
-  padding: 12px 28px;
-  display: block;
-  background: var(--red);
-  color: white;
-  padding: 10px 18px;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: 0.2s ease;
-}
-
-.toggle-lock-btn:hover {
-  opacity: 0.8;
-}
-
-.server-switch {
-  flex-wrap: wrap;
-  /* margin-top: 20px; */
+/* Player controls are absolutely positioned so they do not shift layout */
+.player-controls {
+  position: relative;
+  bottom: 12px;
+  left: 12px;
+  z-index: 35;
   display: flex;
+  margin-top: 20px;
+}
+
+/* Unlock button style */
+.lock-toggle {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+/* Server buttons */
+.server-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: center;
-  gap: 10px;
+  margin-top: 6px;
 }
 
 .server-btn {
-  background: #222;
-  padding: 10px 18px;
-  border-radius: 10px;
+  background: #111;
   color: white;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 9px 14px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s;
-  min-width: 100px;
+  font-weight: 700;
+  min-width: 110px;
 }
 
 .server-btn.active {
-  background: var(--red);
-  color: white;
+  background: linear-gradient(180deg, #ff3a2f, #e10600);
+  border-color: rgba(255, 90, 80, 0.9);
 }
 
-.server-btn:hover {
-  opacity: 0.8;
+/* Loading text */
+.stream-loading {
+  margin-top: 6px;
+  color: var(--muted);
+  font-weight: 600;
 }
-.server-dropdown {
-  display: none;
-  padding: 10px;
-  background: var(--black);
-  color: var(--white);
-  border-radius: 10px;
-  border: 1px solid var(--border);
-}
-/* ✅ RESPONSIVE FIXES */
-@media (max-width: 900px) {
-  .player-wrapper {
-    aspect-ratio: 16/10; /* slightly taller */
+
+/* Responsive tweaks */
+@media (max-width: 1024px) {
+  .player-wrapper.iframeTall {
+    height: min(64vh, 760px);
   }
-}
-
-@media (max-width: 600px) {
-  .player-wrapper {
-    aspect-ratio: 16/20;
-    height: 100vw;
+  .player-wrapper.hlsNormal {
+    height: min(52vh, 560px);
   }
-
-  .lock-btn {
-    width: 90%;
-    max-width: 280px;
-  }
-
   .server-btn {
-    width: 45%;
-    min-width: 140px;
+    min-width: 95px;
   }
 }
 
-@media (max-width: 400px) {
-  .player-wrapper {
-    aspect-ratio: 16/13;
+@media (max-width: 700px) {
+  .player-wrapper.iframeTall {
+    height: 64vh;
+    max-height: none;
   }
-
+  .player-wrapper.hlsNormal {
+    height: 58vh;
+  }
+  .lock-toggle {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
   .server-btn {
-    width: 100%;
+    width: 48%;
+    min-width: 0;
   }
 }
 /* Stats */
