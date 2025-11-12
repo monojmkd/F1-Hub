@@ -93,7 +93,7 @@ export default function Home() {
           {/* Replace with your images */}
           <div
             className="slide"
-            style={{ backgroundImage: "url('/img3.png')" }}
+            style={{ backgroundImage: "url('/img5.png')" }}
           ></div>
           <div
             className="slide"
@@ -102,6 +102,18 @@ export default function Home() {
           <div
             className="slide"
             style={{ backgroundImage: "url('/img1.png')" }}
+          ></div>
+          <div
+            className="slide"
+            style={{ backgroundImage: "url('/img3.png')" }}
+          ></div>
+          <div
+            className="slide"
+            style={{ backgroundImage: "url('/img4.png')" }}
+          ></div>
+          <div
+            className="slide"
+            style={{ backgroundImage: "url('/img6.png')" }}
           ></div>
         </div>
         <div className="hero-inner container fade-in" ref={heroInnerRef}>
