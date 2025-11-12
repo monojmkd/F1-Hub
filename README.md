@@ -83,10 +83,12 @@ It combines race schedules, driver standings, race stats, live streams, and high
 
 ## API References
 
-🧑‍🚀 Driver Standings https://api.jolpi.ca/ergast/f1/2025/driverstandings.json
-🏁 Race Schedule https://api.jolpi.ca/ergast/f1/2025.json
-🧾 Race Results https://api.jolpi.ca/ergast/f1/2025/{round}/results.json
-🏢 Constructors https://api.jolpi.ca/ergast/f1/constructors.json
+|🧑‍🚀 Driver Standings | https://api.jolpi.ca/ergast/f1/2025/driverstandings.json |
+|🏁 Race Schedule | https://api.jolpi.ca/ergast/f1/2025.json |
+|🧾 Race Results | https://api.jolpi.ca/ergast/f1/2025/{round}/results.json |
+|🏢 Constructors | https://api.jolpi.ca/ergast/f1/constructors.json |
+
+---
 
 👨‍💻 Developer
 Developed by Monoj Das
