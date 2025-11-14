@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 
 const streamSources = [
-  // update/create as you like
   {
     id: 1,
     name: "Server 1",
@@ -29,7 +28,6 @@ const LiveStream = () => {
   const [locked, setLocked] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  // init hls only when active.type === 'hls'
   useEffect(() => {
     setLoading(true);
     if (!active) return;
@@ -56,25 +54,21 @@ const LiveStream = () => {
         setLoading(false);
       }
     } else {
-      // iframe mode - mark loaded (we can't detect internal load reliably for cross-origin)
-      // small delay to let iframe settle visually
       setTimeout(() => setLoading(false), 600);
     }
   }, [active]);
 
-  // Determine wrapper height class based on source type
   const wrapperModeClass =
     active?.type === "iframe" ? "iframeTall" : "hlsNormal";
 
   return (
-    <section id="live" className="live-section">
+    <section className="live-section">
       <h2 className="section-title">Live Stream</h2>
       <p className="subtle">
         Choose a server — unlock to interact with the player.
       </p>
 
       <div className="live-container">
-        {/* player wrapper uses explicit responsive height */}
         <div className={`player-wrapper ${wrapperModeClass}`}>
           {active.type === "hls" ? (
             <video
@@ -94,24 +88,20 @@ const LiveStream = () => {
               allowFullScreen
               scrolling="no"
               frameBorder="0"
-              // remove sandbox only if it breaks playback — you can re-add if needed
             />
           )}
+          {/* click blocker overlay (covers iframe/video to prevent accidental clicks) */}
+          <div className={`click-blocker ${locked ? "active" : ""}`} />
         </div>
+
         {/* absolute-positioned unlock button to avoid being pushed */}
         <div className="player-controls">
+          <p>Unlock player to interact with player</p>
           <button className="lock-toggle" onClick={() => setLocked(!locked)}>
             {locked ? "Unlock Player" : "Lock Player"}
           </button>
         </div>
 
-        {/* click blocker overlay (covers iframe/video to prevent accidental clicks) */}
-        {locked && (
-          <div
-            className="click-blocker"
-            title="Click unlock to enable player"
-          />
-        )}
         {/* server buttons */}
         <div className="server-switch">
           {streamSources.map((s) => (
@@ -121,7 +111,6 @@ const LiveStream = () => {
               onClick={() => {
                 setLoading(true);
                 setActive(s);
-                // small delay to reset loading for iframe
                 setTimeout(() => setLoading(false), 700);
               }}
             >

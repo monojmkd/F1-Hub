@@ -27,14 +27,10 @@ const Rankings = () => {
     fetchRankings();
   }, []);
 
-  useEffect(() => {
-    // console.log("Updated standings:", standings);
-  }, [standings]);
-
   return (
     <section id="rankings" className="container">
       <h2 className="section-title">Top 5 Driver Rankings</h2>
-      <div className="panel rankings fade-in">
+      <div className="panel rankings">
         <table className="table">
           <thead>
             <tr>

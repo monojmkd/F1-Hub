@@ -74,7 +74,7 @@ const Highlights = () => {
           ◀
         </button>
 
-        <div className="carousel fade-in" ref={carouselRef}>
+        <div className="carousel" ref={carouselRef}>
           {videos.map((video, index) => (
             <article key={`${video.videoId}-${index}`} className="slide-card">
               <div className="thumb">

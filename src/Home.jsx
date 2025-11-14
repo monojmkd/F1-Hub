@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import Rankings from "./Components/Rankings";
 import AutoRaceStats from "./Components/AutoRaceStats";
 import UpcomingRaces from "./Components/UpcomingRaces";
@@ -6,91 +6,11 @@ import LiveStream from "./Components/LiveStream";
 import Highlights from "./Components/Highlights";
 
 export default function Home() {
-  const [soundOn, setSoundOn] = useState(false);
-  const heroRef = useRef(null);
-  const heroInnerRef = useRef(null);
-  const trackRef = useRef(null);
-  // const audioCtxRef = useRef(null)
-
-  // Dynamic year
-  const year = new Date().getFullYear();
-
-  // IntersectionObserver fade-in
-  useEffect(() => {
-    const els = document.querySelectorAll(".fade-in");
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) e.target.classList.add("is-visible");
-        });
-      },
-      { threshold: 0.15 }
-    );
-    els.forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
-  }, []);
-
-  // Hero tilt interaction
-  useEffect(() => {
-    const hero = heroRef.current;
-    const inner = heroInnerRef.current;
-    if (!hero || !inner) return;
-
-    const onMove = (e) => {
-      const { clientX, clientY } = e;
-      const x = (clientX / window.innerWidth - 0.5) * 20;
-      const y = (clientY / window.innerHeight - 0.5) * 20;
-      inner.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
-    };
-    const onLeave = () => {
-      inner.style.transform = "rotateY(0deg) rotateX(0deg)";
-    };
-    hero.addEventListener("mousemove", onMove);
-    hero.addEventListener("mouseleave", onLeave);
-    return () => {
-      hero.removeEventListener("mousemove", onMove);
-      hero.removeEventListener("mouseleave", onLeave);
-    };
-  }, []);
-
-  // Carousel wheel horizontal scroll
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const onWheel = (e) => {
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        track.scrollLeft += e.deltaY;
-      }
-    };
-    track.addEventListener("wheel", onWheel, { passive: false });
-    return () => track.removeEventListener("wheel", onWheel);
-  }, []);
-
-  //   useEffect(() => {
-  //     const hero = heroRef.current;
-  //     if (!hero) return;
-  //     const onEnter = () => playEngineRev();
-  //     const onClick = () => playEngineRev();
-  //     hero.addEventListener("mouseenter", onEnter);
-  //     hero.addEventListener("click", onClick);
-  //     return () => {
-  //       hero.removeEventListener("mouseenter", onEnter);
-  //       hero.removeEventListener("click", onClick);
-  //     };
-  //   }, [soundOn]);
-
   return (
     <div>
-      {/* Hero */}
-      <section
-        id="home"
-        className="hero"
-        ref={heroRef}
-        style={{ marginBottom: "2%" }}
-      >
+      {/* Hero Section */}
+      <section id="home" className="hero" style={{ marginBottom: "2%" }}>
         <div className="slideshow">
-          {/* Replace with your images */}
           <div
             className="slide"
             style={{ backgroundImage: "url('/img5.png')" }}
@@ -116,12 +36,15 @@ export default function Home() {
             style={{ backgroundImage: "url('/img6.png')" }}
           ></div>
         </div>
-        <div className="hero-inner container fade-in" ref={heroInnerRef}>
+
+        {/* Text overlay */}
+        <div className="hero-inner container">
           <h1>Experience the Thrill of Formula 1</h1>
           <p>
-            Live speed. Live strategy. Live drama. Catch real‑time updates and
-            stream every heart‑pounding lap.
+            Live speed. Live strategy. Live drama. Catch real-time updates and
+            stream every heart-pounding lap.
           </p>
+
           <div className="actions">
             <a href="#live" className="btn btn-red">
               Watch Live
@@ -129,21 +52,15 @@ export default function Home() {
             <a href="#rankings" className="btn btn-dark">
               View Rankings
             </a>
-            {/* <button
-              className={`sound-toggle ${soundOn ? 'on' : ''}`}
-              aria-pressed={soundOn ? 'true' : 'false'}
-              onClick={()=>setSoundOn(s=>!s)}
-              title={soundOn ? 'Sound: ON' : 'Sound: OFF'}
-            >
-              🔊
-            </button> */}
           </div>
         </div>
       </section>
 
-      {/* Rankings */}
-      <Rankings />
-      {/* Live Stream */}
+      {/* Rankings - ADD ID HERE */}
+      <section id="rankings" className="container" style={{ marginTop: "2%" }}>
+        <Rankings />
+      </section>
+
       <section
         id="live"
         className="container"
@@ -151,6 +68,8 @@ export default function Home() {
       >
         <LiveStream />
       </section>
+
+      {/* Auto Race Stats */}
       <section
         id="stats"
         className="container"
@@ -165,7 +84,7 @@ export default function Home() {
       </section>
 
       {/* Highlights */}
-      <section style={{ marginTop: "2%" }}>
+      <section id="highlights" style={{ marginTop: "2%" }}>
         <Highlights />
       </section>
     </div>
