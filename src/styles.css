@@ -273,6 +273,12 @@ nav a:hover {
   z-index: 3;
 }
 
+@media (max-width: 900px) {
+  .hero-inner .actions {
+    margin-top: 16%;
+  }
+}
+
 .btn {
   cursor: pointer;
   padding: 10px 15px;
