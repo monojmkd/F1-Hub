@@ -18,7 +18,7 @@ const streamSources = [
     id: 3,
     name: "Server 3",
     type: "iframe",
-    url: "https://embednow.top/embed/f1/2025/brazil/race",
+    url: "https://embednow.top/embed/f1/2026/brazil/race",
   },
 ];
 

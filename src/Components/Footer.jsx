@@ -31,8 +31,8 @@ export const Footer = () => {
             marginTop: "-18px",
           }}
         >
-          <p>-</p>
-          <p style={{ color: "black" }}>Made by MKD</p>
+          {/* <p>-</p> */}
+          {/* <p style={{ color: "black" }}>Made by MKD</p> */}
         </div>
       </div>
     </footer>

@@ -85,9 +85,9 @@ It combines race schedules, driver standings, race stats, live streams, and high
 
 | Endpoint                | URL                                                        |
 | ----------------------- | ---------------------------------------------------------- |
-| 🧑‍🚀 **Driver Standings** | `https://api.jolpi.ca/ergast/f1/2025/driverstandings.json` |
-| 🏁 **Race Schedule**    | `https://api.jolpi.ca/ergast/f1/2025.json`                 |
-| 🧾 **Race Results**     | `https://api.jolpi.ca/ergast/f1/2025/{round}/results.json` |
+| 🧑‍🚀 **Driver Standings** | `https://api.jolpi.ca/ergast/f1/2026/driverstandings.json` |
+| 🏁 **Race Schedule**    | `https://api.jolpi.ca/ergast/f1/2026.json`                 |
+| 🧾 **Race Results**     | `https://api.jolpi.ca/ergast/f1/2026/{round}/results.json` |
 | 🏢 **Constructors**     | `https://api.jolpi.ca/ergast/f1/constructors.json`         |
 
 ---

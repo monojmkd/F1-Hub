@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import RaceStats from "./RaceStats";
 
-const AutoRaceStats = ({ year = 2025 }) => {
+const AutoRaceStats = ({ year = 2026 }) => {
   const [round, setRound] = useState(null);
 
   useEffect(() => {
