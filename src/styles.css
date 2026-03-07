@@ -361,7 +361,7 @@ h4 {
    ============================================================ */
 .hero {
   position: relative;
-  height: 80vh;
+  height: 100vh;
   min-height: 560px;
   max-height: 840px;
   display: flex;
@@ -2003,4 +2003,74 @@ footer .container > div p[style*="color: black"] {
     backdrop-filter: none;
     background: rgba(14, 14, 16, 0.95);
   }
+}
+
+/* ============================================================
+   HIGHLIGHTS — dynamic feed additions  (.hl-*)
+   ============================================================ */
+.hl-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* "Live Feed" green pill */
+.hl-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  background: rgba(74, 222, 128, 0.06);
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  align-self: flex-start;
+  margin-top: 2px;
+}
+
+.hl-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: livePulse 1.8s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes livePulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.7);
+  }
+}
+
+/* channel + published meta row inside each card */
+.hl-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 2px 0;
+}
+
+.hl-channel {
+  font-size: 11px;
+  color: var(--grey);
+}
+.hl-published {
+  font-size: 11px;
+  color: var(--grey-dim);
 }
