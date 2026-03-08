@@ -1170,20 +1170,26 @@ h4 {
   position: relative;
   width: 100%;
   max-width: 960px;
-  aspect-ratio: 16 / 8.5;
-  border: 1px solid var(--border-hi);
+  border: 2px solid rgb(78, 0, 0);
   border-radius: 14px;
   overflow: hidden;
-  background: linear-gradient(180deg, #0d0d10, #07070a);
+  background: #000;
   box-shadow:
     var(--shadow),
     0 0 60px rgba(225, 6, 0, 0.06);
+  transition: height 220ms ease;
 }
-.player-wrapper.iframeTall {
-  aspect-ratio: 16 / 10;
-}
+
+/* HLS / native video: fixed viewport height, no aspect-ratio */
 .player-wrapper.hlsNormal {
-  aspect-ratio: 16 / 9;
+  height: min(56vh, 640px);
+  max-height: 720px;
+}
+
+/* Iframe embeds: taller so controls don't get clipped */
+.player-wrapper.iframeTall {
+  height: min(72vh, 900px);
+  max-height: 1100px;
 }
 
 .player-wrapper iframe,
@@ -1696,6 +1702,14 @@ footer .container > div p[style*="color: black"] {
   .player-wrapper {
     border-radius: 10px;
   }
+  .player-wrapper.iframeTall {
+    height: min(64vh, 760px);
+    max-height: none;
+  }
+  .player-wrapper.hlsNormal {
+    height: min(52vh, 560px);
+    max-height: none;
+  }
 
   .rc-row {
     grid-template-columns: 36px 4px 1fr auto auto;
@@ -1720,6 +1734,16 @@ footer .container > div p[style*="color: black"] {
   }
   .rr-winner-time {
     margin-left: 0;
+  }
+  .player-wrapper.iframeTall {
+    height: 64vh;
+  }
+  .player-wrapper.hlsNormal {
+    height: 58vh;
+  }
+  .server-btn {
+    width: 48%;
+    min-width: 0;
   }
 }
 
