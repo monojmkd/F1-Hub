@@ -40,12 +40,17 @@ const UpcomingRaces = ({ season = 2026 }) => {
         const data = await res.json();
         const races = data?.MRData?.RaceTable?.Races || [];
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const now = new Date();
 
-        const index = races.findIndex(
-          (r) => new Date(r.date + "T00:00:00") >= today,
-        );
+        // Compare the actual race start time (UTC) against right now —
+        // not just the date. This prevents a completed race from still
+        // showing as "upcoming" on race day after it has finished.
+        // Add a 3-hour buffer so the card clears well after the chequered flag.
+        const index = races.findIndex((r) => {
+          const raceEnd = new Date(`${r.date}T${r.time || "14:00:00"}`);
+          raceEnd.setHours(raceEnd.getHours() + 3); // ~race duration buffer
+          return raceEnd > now;
+        });
 
         setUpcoming(index !== -1 ? races.slice(index, index + 3) : []);
       } catch (err) {
