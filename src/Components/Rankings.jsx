@@ -1,50 +1,62 @@
 import React, { useEffect, useState } from "react";
 
-// ─────────────────────────────────────────────────────────────────
-//  DATA STRATEGY — 3-layer approach
-//
-//  Layer 1 — localStorage cache
-//    Standings are saved with a timestamp + race key.
-//    On load we show the cache instantly (no spinner).
-//
-//  Layer 2 — OpenF1 staleness check  (api.openf1.org)
-//    OpenF1 pulls directly from F1's live timing system.
-//    We ask: "Has a new race ended since we last cached?"
-//    If yes → refetch Ergast for updated standings.
-//    If no  → cache is still valid → skip the slow Ergast call.
-//
-//  Layer 3 — Ergast fetch (only when stale)
-//    Hit Jolpica/Ergast only when OpenF1 confirms a new race
-//    has finished. Avoids hammering a slow API on every load.
-//
-//  Result:
-//    Race day + after  → OpenF1 detects completion → auto refresh
-//    Normal days       → instant from cache, zero slow API calls
-// ─────────────────────────────────────────────────────────────────
-
 const SEASON = 2026;
 const CACHE_KEY = `f1_standings_${SEASON}`;
 const OPENF1_BASE = "https://api.openf1.org/v1";
 const ERGAST_BASE = "https://api.jolpi.ca/ergast/f1";
 
-const TEAM_COLORS = {
-  "Red Bull": "#3671C6",
-  Ferrari: "#E8002D",
-  McLaren: "#FF8000",
-  Mercedes: "#27F4D2",
-  "Aston Martin": "#229971",
-  Alpine: "#FF87BC",
-  Williams: "#64C4FF",
-  "Kick Sauber": "#52E252",
-  RB: "#6692FF",
-  Haas: "#B6BABD",
+const TEAM_META = {
+  "Red Bull": {
+    color: "#3671C6",
+    logo: "https://media.formula1.com/image/upload/c_lfill,w_64/q_auto/v1740000000/common/f1/2026/redbullracing/2026redbullracinglogowhite.webp",
+  },
+  Ferrari: {
+    color: "#E8002D",
+    logo: "https://media.formula1.com/image/upload/c_lfill,w_64/q_auto/v1740000000/common/f1/2026/ferrari/2026ferrarilogowhite.webp",
+  },
+  McLaren: {
+    color: "#FF8000",
+    logo: "https://media.formula1.com/image/upload/c_lfill,w_64/q_auto/v1740000000/common/f1/2026/mclaren/2026mclarenlogowhite.webp",
+  },
+  Mercedes: {
+    color: "#27F4D2",
+    logo: "https://media.formula1.com/image/upload/c_lfill,w_64/q_auto/v1740000000/common/f1/2026/mercedes/2026mercedeslogowhite.webp",
+  },
+  "Aston Martin": {
+    color: "#229971",
+    logo: "https://media.formula1.com/image/upload/c_lfill,w_64/q_auto/v1740000000/common/f1/2026/astonmartin/2026astonmartinlogowhite.webp",
+  },
+  Alpine: {
+    color: "#FF87BC",
+    logo: "https://media.formula1.com/image/upload/c_lfill,w_64/q_auto/v1740000000/common/f1/2026/alpine/2026alpinelogowhite.webp",
+  },
+  Audi: {
+    color: "#FF2D00",
+    logo: "https://media.formula1.com/image/upload/c_lfill,w_64/q_auto/v1740000000/common/f1/2026/audi/2026audilogowhite.webp",
+  },
+  Cadillac: {
+    color: "#AAAAAD",
+    logo: "https://media.formula1.com/image/upload/c_lfill,w_64/q_auto/v1740000000/common/f1/2026/cadillac/2026cadillaclogowhite.webp",
+  },
+  RB: {
+    color: "#6692FF",
+    logo: "https://media.formula1.com/image/upload/c_lfill,w_64/q_auto/v1740000000/common/f1/2026/racingbulls/2026racingbullslogowhite.webp",
+  },
+  Haas: {
+    color: "#B6BABD",
+    logo: "https://media.formula1.com/image/upload/c_lfill,w_64/q_auto/v1740000000/common/f1/2026/haasf1team/2026haasf1teamlogowhite.webp",
+  },
+  Williams: {
+    color: "#1868DB",
+    logo: "https://media.formula1.com/image/upload/c_lfill,w_64/q_auto/v1740000000/common/f1/2026/williams/2026williamslogowhite.webp",
+  },
 };
 
-function teamColor(name = "") {
-  for (const [key, val] of Object.entries(TEAM_COLORS)) {
+function teamMeta(name = "") {
+  for (const [key, val] of Object.entries(TEAM_META)) {
     if (name.toLowerCase().includes(key.toLowerCase())) return val;
   }
-  return "#555";
+  return { color: "#555", logo: null };
 }
 
 // ── Cache helpers ─────────────────────────────────────────────
@@ -53,12 +65,10 @@ function readCache() {
     const raw = localStorage.getItem(CACHE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    // Treat cache as missing if it has no actual standings data
     if (!parsed?.drivers?.length) {
-      localStorage.removeItem(CACHE_KEY); // purge corrupt/empty cache
+      localStorage.removeItem(CACHE_KEY);
       return null;
     }
-    // Ensure legacy full-list caches are trimmed to top 5
     return {
       ...parsed,
       drivers: parsed.drivers.slice(0, 5),
@@ -81,27 +91,25 @@ function writeCache(drivers, constructors, raceKey) {
       }),
     );
   } catch {
-    /* storage full — ignore */
+    /* storage full */
   }
 }
 
-// ── OpenF1: find the latest completed race ─────────────────────
+// ── OpenF1: latest completed race ─────────────────────────────
 async function getLatestCompletedRace() {
   const res = await fetch(
     `${OPENF1_BASE}/sessions?session_type=Race&year=${SEASON}`,
   );
   const data = await res.json();
   if (!data?.length) return null;
-
   const now = Date.now();
   const past = data
     .filter((s) => s.date_end && new Date(s.date_end).getTime() < now)
     .sort((a, b) => new Date(b.date_end) - new Date(a.date_end));
-
   return past[0] || null;
 }
 
-// ── Ergast: fetch current standings ───────────────────────────
+// ── Ergast: fetch standings ────────────────────────────────────
 async function fetchErgastStandings() {
   const [drRes, ctRes] = await Promise.all([
     fetch(`${ERGAST_BASE}/${SEASON}/driverstandings.json`),
@@ -109,7 +117,6 @@ async function fetchErgastStandings() {
   ]);
   const drData = await drRes.json();
   const ctData = await ctRes.json();
-
   return {
     drivers: (
       drData?.MRData?.StandingsTable?.StandingsLists[0]?.DriverStandings || []
@@ -133,8 +140,6 @@ const Rankings = () => {
   useEffect(() => {
     async function load() {
       const cache = readCache();
-
-      // Show cache immediately — no spinner on return visits
       if (cache) {
         setStandings({
           drivers: cache.drivers,
@@ -144,18 +149,13 @@ const Rankings = () => {
         setDataSource("cache");
         setCacheAge(Math.round((Date.now() - cache.savedAt) / 60000));
       }
-
       try {
-        // OpenF1 check: what's the last completed race?
         const latest = await getLatestCompletedRace();
-
         if (latest) {
           const raceKey = `${SEASON}-${latest.session_key}`;
-          setLastRace(`${latest.location}`);
-
-          // Refetch Ergast if: no cache, stale race key, OR cache has no actual data
           const cacheEmpty =
             !cache?.drivers?.length || !cache?.constructors?.length;
+          setLastRace(latest.location);
           if (!cache || cache.raceKey !== raceKey || cacheEmpty) {
             setDataSource("fetching");
             const fresh = await fetchErgastStandings();
@@ -167,10 +167,9 @@ const Rankings = () => {
             setDataSource("fresh");
             setCacheAge(0);
           } else {
-            setDataSource("live"); // cache matches latest race — already up to date
+            setDataSource("live");
           }
         } else {
-          // No race ended yet this season
           if (!cache) {
             const fresh = await fetchErgastStandings();
             if (fresh.drivers.length) {
@@ -194,7 +193,6 @@ const Rankings = () => {
         setLoading(false);
       }
     }
-
     load();
   }, []);
 
@@ -202,7 +200,7 @@ const Rankings = () => {
   const maxPts = Number(rows?.[0]?.points) || 1;
 
   function StatusBadge() {
-    const props = {
+    const map = {
       fetching: ["rk-status--loading", "⟳ Updating…"],
       fresh: ["rk-status--fresh", "✓ Just updated"],
       live: ["rk-status--live", "● Up to date"],
@@ -213,8 +211,8 @@ const Rankings = () => {
           ? `⏱ ${cacheAge < 60 ? `${cacheAge}m` : `${Math.round(cacheAge / 60)}h`} ago`
           : "⏱ Cached",
       ],
-    }[dataSource];
-
+    };
+    const props = map[dataSource];
     if (!props) return null;
     return <span className={`rk-status ${props[0]}`}>{props[1]}</span>;
   }
@@ -254,7 +252,7 @@ const Rankings = () => {
               <tr>
                 <th style={{ width: 48 }}>Pos</th>
                 <th>{tab === "drivers" ? "Driver" : "Constructor"}</th>
-                {tab === "drivers" && <th>Team</th>}
+                {tab === "drivers" && <th className="rk-th-team">Team</th>}
                 <th>Wins</th>
                 <th className="th-right">Points</th>
                 <th style={{ minWidth: 120 }}></th>
@@ -270,7 +268,7 @@ const Rankings = () => {
                   tab === "drivers"
                     ? s.Constructors[0]?.name
                     : s.Constructor.name;
-                const color = teamColor(team);
+                const meta = teamMeta(team);
                 const pct = (Number(s.points) / maxPts) * 100;
                 const key =
                   tab === "drivers"
@@ -282,23 +280,37 @@ const Rankings = () => {
                     <td>
                       <span className="badge">{s.position}</span>
                     </td>
+
+                    {/* Name column — logo sits inline next to name */}
                     <td>
                       <div className="rk-driver-cell">
                         <span
                           className="rk-color-dot"
-                          style={{ background: color }}
+                          style={{ background: meta.color }}
                         />
-                        <div>
-                          <div className="rk-driver-name">{name}</div>
-                          {tab === "drivers" && (
-                            <div className="rk-team-sub">{team}</div>
-                          )}
+                        <div className="rk-name-block">
+                          <div className="rk-name-row">
+                            {meta.logo && (
+                              <img
+                                src={meta.logo}
+                                alt={team}
+                                className="rk-team-logo"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = "none";
+                                }}
+                              />
+                            )}
+                            <span className="rk-driver-name">{name}</span>
+                          </div>
                         </div>
                       </div>
                     </td>
+
+                    {/* Standalone Team column (drivers tab only) — text only, no logo */}
                     {tab === "drivers" && (
                       <td className="rk-team-col">{team}</td>
                     )}
+
                     <td>
                       <span className="rk-mono">{s.wins}</span>
                     </td>
@@ -309,7 +321,7 @@ const Rankings = () => {
                       <div className="rk-bar-wrap">
                         <div
                           className="rk-bar"
-                          style={{ width: `${pct}%`, background: color }}
+                          style={{ width: `${pct}%`, background: meta.color }}
                         />
                       </div>
                     </td>

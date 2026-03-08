@@ -2098,3 +2098,224 @@ footer .container > div p[style*="color: black"] {
   font-size: 11px;
   color: var(--grey-dim);
 }
+
+/* OGG stream error message */
+.stream-error {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--red);
+  border: 1px solid rgba(225, 6, 0, 0.25);
+  background: rgba(225, 6, 0, 0.06);
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+/* ============================================================
+   RANKINGS — header row + status badge  (.rk-status, .rk-header-row)
+   ============================================================ */
+.rk-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.rk-status {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.rk-status--live {
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  background: rgba(74, 222, 128, 0.06);
+}
+.rk-status--fresh {
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  background: rgba(74, 222, 128, 0.1);
+}
+.rk-status--loading {
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  background: rgba(251, 191, 36, 0.06);
+}
+.rk-status--cache {
+  color: var(--grey);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* ============================================================
+   RANKINGS — team logos (.rk-team-logo)
+   ============================================================ */
+.rk-team-logo {
+  display: inline-block;
+  height: 18px;
+  width: auto;
+  max-width: 56px;
+  object-fit: contain;
+  vertical-align: middle;
+  /* margin-right: 6px; */
+  opacity: 0.9;
+  transition: opacity 0.15s;
+}
+.rk-team-logo:hover {
+  opacity: 1;
+}
+
+.rk-team-sub {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+/* Constructor tab: show a slightly larger logo inline with name */
+.rk-team-logo--constructor {
+  height: 14px;
+  max-width: 60px;
+  margin-right: 6px;
+}
+
+/* ============================================================
+   RANKINGS — Responsive
+   ============================================================ */
+
+/* ── Tablet (≤ 768px) ── */
+@media (max-width: 768px) {
+  /* shrink tab buttons */
+  .rk-tabs {
+    gap: 6px;
+  }
+  .rk-tab {
+    font-size: 11px;
+    padding: 7px 14px;
+  }
+
+  /* header row stacks vertically */
+  .rk-header-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .rk-status {
+    align-self: flex-start;
+  }
+
+  /* hide the redundant standalone Team column —
+     team name already shows as .rk-team-sub under the driver */
+  .rk-team-col {
+    display: none;
+  }
+  th.rk-th-team {
+    display: none;
+  }
+
+  /* tighten table cells */
+  .table td,
+  .table th {
+    padding: 10px 8px;
+  }
+
+  /* shrink the points bar to save space */
+  .rk-bar-wrap {
+    height: 4px;
+    min-width: 60px;
+  }
+
+  /* driver name slightly smaller */
+  .rk-driver-name {
+    font-size: 13px;
+  }
+  .rk-team-sub {
+    font-size: 10px;
+  }
+
+  /* tighten color dot */
+  .rk-color-dot {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+  }
+}
+
+/* ── Mobile (≤ 480px) ── */
+@media (max-width: 480px) {
+  /* hide the bar column entirely — too narrow to be useful */
+  .rk-bar-wrap {
+    display: none;
+  }
+  th:last-child,
+  td:last-child {
+    display: none;
+  }
+
+  /* make points column inline with driver row to save a column */
+  .table td {
+    padding: 9px 6px;
+    font-size: 12px;
+  }
+  .table th {
+    padding: 9px 6px;
+    font-size: 11px;
+  }
+
+  .rk-driver-cell {
+    gap: 7px;
+  }
+  .rk-driver-name {
+    font-size: 12px;
+  }
+  .rk-team-sub {
+    display: none;
+  } /* already shown via .rk-team-col hidden above */
+
+  .rk-mono {
+    font-size: 12px;
+  }
+
+  /* badge (position number) tighter */
+  .badge {
+    min-width: 22px;
+    padding: 3px 5px;
+    font-size: 11px;
+  }
+}
+
+/* ── Name + logo inline layout ── */
+.rk-name-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rk-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rk-team-logo {
+  height: 18px;
+  width: auto;
+  max-width: 48px;
+  object-fit: contain;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+@media (max-width: 480px) {
+  .rk-team-logo {
+    height: 14px;
+    max-width: 36px;
+  }
+}
