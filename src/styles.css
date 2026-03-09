@@ -2761,9 +2761,13 @@ footer .container > div p[style*="color: black"] {
 
 .nb-bar__preview-inner {
   display: flex;
-  gap: 32px;
-  animation: nbScroll 40s linear infinite;
+  gap: 40px;
+  animation: nbScroll 5s linear infinite;
   white-space: nowrap;
+  will-change: transform;
+  transform: translateZ(0); /* force GPU layer */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .nb-bar:hover .nb-bar__preview-inner {
   animation-play-state: paused;
@@ -2771,10 +2775,10 @@ footer .container > div p[style*="color: black"] {
 
 @keyframes nbScroll {
   0% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
