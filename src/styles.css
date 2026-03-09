@@ -2453,3 +2453,210 @@ footer .container > div p[style*="color: black"] {
     padding: 6px 12px;
   }
 }
+
+/* ============================================================
+   NEWS TICKER  (.news-ticker*)
+   Vertically pinned on the left side of the hero
+   ============================================================ */
+.news-ticker {
+  position: absolute;
+  left: 28px;
+  bottom: 56px;
+  top: 90px; /* clears the topbar */
+  z-index: 3;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 10, 12, 0.82);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    var(--shadow),
+    0 0 40px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  animation: fadeUp 0.5s ease 0.2s both;
+}
+
+/* header row */
+.news-ticker__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: rgba(225, 6, 0, 0.08);
+}
+
+.news-ticker__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--red);
+  flex-shrink: 0;
+  animation: livePulse 1.8s ease-in-out infinite;
+}
+
+.news-ticker__label {
+  font-family: "Orbitron", sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--white);
+  flex: 1;
+}
+
+.news-ticker__source {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+/* scrollable list */
+.news-ticker__list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(225, 6, 0, 0.3) transparent;
+}
+.news-ticker__list::-webkit-scrollbar {
+  width: 3px;
+}
+.news-ticker__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.news-ticker__list::-webkit-scrollbar-thumb {
+  background: rgba(225, 6, 0, 0.35);
+  border-radius: 2px;
+}
+
+/* each article link */
+.news-ticker__item {
+  display: block;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  transition: background 0.15s;
+  position: relative;
+  cursor: pointer;
+}
+.news-ticker__item:last-child {
+  border-bottom: none;
+}
+.news-ticker__item:hover,
+.news-ticker__item--hovered {
+  background: rgba(225, 6, 0, 0.07);
+}
+
+.news-ticker__item-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* numbered index */
+.news-ticker__index {
+  font-family: "Orbitron", sans-serif;
+  font-size: 9px;
+  color: var(--red);
+  flex-shrink: 0;
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+.news-ticker__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.news-ticker__title {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--off-white);
+  letter-spacing: 0.01em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+}
+.news-ticker__item--hovered .news-ticker__title {
+  color: var(--white);
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+}
+
+/* description shown on hover */
+.news-ticker__desc {
+  font-size: 10px;
+  color: var(--grey);
+  line-height: 1.4;
+  font-family: "Barlow Condensed", sans-serif;
+  letter-spacing: 0.01em;
+  animation: fadeUp 0.15s ease both;
+}
+
+/* timestamp */
+.news-ticker__age {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 9px;
+  color: var(--grey-dim);
+  flex-shrink: 0;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+/* arrow shown on hover */
+.news-ticker__arrow {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  font-size: 11px;
+  color: var(--red);
+  animation: fadeUp 0.1s ease both;
+}
+
+/* skeleton loaders */
+.news-ticker__skeleton {
+  height: 44px;
+  margin: 8px 14px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1200px) {
+  .news-ticker {
+    width: 260px;
+    left: 16px;
+  }
+}
+
+/* On tablet/mobile the ticker moves below the hero text
+   and becomes a horizontal scrolling strip */
+@media (max-width: 900px) {
+  .news-ticker {
+    position: static;
+    width: 100%;
+    max-height: 260px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    backdrop-filter: none;
+    background: rgba(10, 10, 12, 0.95);
+    top: auto;
+    bottom: auto;
+    left: auto;
+  }
+}
