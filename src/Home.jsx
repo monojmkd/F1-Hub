@@ -5,7 +5,158 @@ import UpcomingRaces from "./Components/UpcomingRaces";
 import LiveStream from "./Components/LiveStream";
 import Highlights from "./Components/Highlights";
 
-/*  Next Race Countdown Card  */
+// ── RSS sources — tried in order until one succeeds ──────────
+// All fetched via allorigins.win (same CORS proxy as Highlights)
+const RSS_SOURCES = [
+  {
+    name: "BBC Sport F1",
+    url: "https://feeds.bbci.co.uk/sport/formula1/rss.xml",
+  },
+  {
+    name: "Autosport",
+    url: "https://www.autosport.com/rss/f1/news/",
+  },
+  {
+    name: "Sky Sports F1",
+    url: "https://www.skysports.com/rss/12433",
+  },
+];
+
+function proxyUrl(rssUrl) {
+  return `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
+}
+
+// Parse an RSS/Atom XML string into plain article objects
+function parseRSS(xmlString) {
+  const doc = new DOMParser().parseFromString(xmlString, "text/xml");
+  const items = Array.from(doc.querySelectorAll("item, entry"));
+
+  return items
+    .slice(0, 12)
+    .map((item) => {
+      const title = item.querySelector("title")?.textContent?.trim() || "";
+      // link can be a tag text or an attribute
+      const linkEl = item.querySelector("link");
+      const link =
+        linkEl?.getAttribute("href") || linkEl?.textContent?.trim() || "#";
+      const pubDate =
+        item
+          .querySelector("pubDate, published, updated")
+          ?.textContent?.trim() || "";
+      const desc =
+        item
+          .querySelector("description, summary")
+          ?.textContent?.replace(/<[^>]+>/g, "") // strip any embedded HTML
+          ?.trim()
+          ?.slice(0, 120) || "";
+
+      return { title, link, pubDate, desc };
+    })
+    .filter((a) => a.title && a.link !== "#");
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return "";
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+/* ── News Ticker ─────────────────────────────────────────── */
+function NewsTicker() {
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [source, setSource] = useState("");
+  const [hovered, setHovered] = useState(null);
+  const listRef = useRef(null);
+
+  useEffect(() => {
+    async function fetchNews() {
+      for (const src of RSS_SOURCES) {
+        try {
+          const res = await fetch(proxyUrl(src.url));
+          if (!res.ok) continue;
+          const json = await res.json();
+          if (!json.contents) continue;
+          const parsed = parseRSS(json.contents);
+          if (!parsed.length) continue;
+          setArticles(parsed);
+          setSource(src.name);
+          return;
+        } catch {
+          continue;
+        }
+      }
+      // All sources failed — show nothing silently
+      setArticles([]);
+    }
+    fetchNews().finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="news-ticker">
+        <div className="news-ticker__header">
+          <span className="news-ticker__label">F1 News</span>
+        </div>
+        <div className="news-ticker__list">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div key={i} className="news-ticker__skeleton shimmer" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!articles.length) return null;
+
+  return (
+    <div className="news-ticker">
+      {/* header */}
+      <div className="news-ticker__header">
+        <span className="news-ticker__dot" />
+        <span className="news-ticker__label">Latest F1 News</span>
+        <span className="news-ticker__source">{source}</span>
+      </div>
+
+      {/* scrollable list */}
+      <div className="news-ticker__list" ref={listRef}>
+        {articles.map((a, i) => (
+          <a
+            key={i}
+            href={a.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`news-ticker__item ${hovered === i ? "news-ticker__item--hovered" : ""}`}
+            onMouseEnter={() => setHovered(i)}
+            onMouseLeave={() => setHovered(null)}
+          >
+            <div className="news-ticker__item-inner">
+              <span className="news-ticker__index">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div className="news-ticker__content">
+                <span className="news-ticker__title">{a.title}</span>
+                {a.desc && hovered === i && (
+                  <span className="news-ticker__desc">{a.desc}…</span>
+                )}
+              </div>
+              {a.pubDate && (
+                <span className="news-ticker__age">{timeAgo(a.pubDate)}</span>
+              )}
+            </div>
+            {hovered === i && <span className="news-ticker__arrow">→</span>}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Next Race Countdown Card ────────────────────────────── */
 function NextRaceCard() {
   const [race, setRace] = useState(null);
   const [countdown, setCountdown] = useState({
@@ -74,21 +225,15 @@ function NextRaceCard() {
 
   return (
     <div className="nrc-card">
-      {/* top accent bar */}
       <div className="nrc-accent" />
-
       <div className="nrc-label">⚑ Next Race</div>
-
       <div className="nrc-round">Round {race.round}</div>
       <div className="nrc-name">{race.raceName}</div>
       <div className="nrc-circuit">{race.Circuit.circuitName}</div>
       <div className="nrc-location">
         {race.Circuit.Location.locality}, {race.Circuit.Location.country}
       </div>
-
       <div className="nrc-divider" />
-
-      {/* countdown */}
       <div className="nrc-countdown">
         {[
           [countdown.days, "Days"],
@@ -102,15 +247,11 @@ function NextRaceCard() {
           </div>
         ))}
       </div>
-
       <div className="nrc-divider" />
-
-      {/* date/time row */}
       <div className="nrc-datetime">
         <span className="nrc-date-val">{dateStr}</span>
         {timeStr && <span className="nrc-time-val">{timeStr}</span>}
       </div>
-
       <a href="#schedule" className="nrc-cta">
         View Schedule →
       </a>
@@ -118,11 +259,11 @@ function NextRaceCard() {
   );
 }
 
-/*  Home  */
+/* ── Home ────────────────────────────────────────────────── */
 export default function Home() {
   return (
     <div>
-      {/*  HERO  */}
+      {/* ── HERO ─────────────────────────────────────────────── */}
       <section id="home" className="hero">
         <div className="slideshow">
           <div
@@ -177,7 +318,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/*  Next race pop-out card  */}
+        {/* ── News ticker — left side ── */}
+        <NewsTicker />
+
+        {/* ── Next race card — right side ── */}
         <NextRaceCard />
 
         {/* scroll hint */}
@@ -187,17 +331,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/*  RANKINGS  */}
+      {/* ── RANKINGS ─────────────────────────────────────────── */}
       <section id="rankings" className="home-section container">
         <Rankings />
       </section>
 
-      {/*  LIVE STREAM  */}
+      {/* ── LIVE STREAM ──────────────────────────────────────── */}
       <section id="live" className="home-section container">
         <LiveStream />
       </section>
 
-      {/*  LATEST RACE STATS  */}
+      {/* ── LATEST RACE STATS ────────────────────────────────── */}
       <section
         id="stats"
         className="home-section home-section--narrow container"
@@ -205,12 +349,12 @@ export default function Home() {
         <AutoRaceStats year={2026} />
       </section>
 
-      {/*  UPCOMING RACES  */}
+      {/* ── UPCOMING RACES ───────────────────────────────────── */}
       <section id="schedule" className="home-section container">
         <UpcomingRaces />
       </section>
 
-      {/*  HIGHLIGHTS  */}
+      {/* ── HIGHLIGHTS ───────────────────────────────────────── */}
       <section id="highlights" className="home-section container">
         <Highlights />
       </section>
