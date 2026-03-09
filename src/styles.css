@@ -2168,7 +2168,7 @@ footer .container > div p[style*="color: black"] {
   max-width: 56px;
   object-fit: contain;
   vertical-align: middle;
-  /* margin-right: 6px; */
+  margin-right: 6px;
   opacity: 0.9;
   transition: opacity 0.15s;
 }
@@ -2317,5 +2317,139 @@ footer .container > div p[style*="color: black"] {
   .rk-team-logo {
     height: 14px;
     max-width: 36px;
+  }
+}
+
+/* ============================================================
+   UPCOMING RACES — session schedule inside card  (.uc-*)
+   ============================================================ */
+
+/* info block (replaces old .info) */
+.uc-info {
+  padding: 12px 14px 8px;
+}
+.uc-round-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+/* Sprint weekend badge */
+.uc-sprint-badge {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, #ff6a00, #e10600);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+/* session list */
+.uc-sessions {
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.uc-session {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+  position: relative;
+  transition: background 0.15s;
+}
+.uc-session:last-child {
+  border-bottom: none;
+}
+.uc-session:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Race row — slightly highlighted */
+.uc-session--race {
+  background: rgba(225, 6, 0, 0.05);
+}
+.uc-session--race .uc-session-label {
+  color: var(--red);
+  font-weight: 700;
+}
+
+/* Live session — pulsing green highlight */
+.uc-session--live {
+  background: rgba(74, 222, 128, 0.06);
+}
+.uc-session--live .uc-session-label {
+  color: #4ade80;
+}
+
+/* label */
+.uc-session-label {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--grey);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+/* date + time group */
+.uc-session-datetime {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.uc-session-day {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--off-white);
+  letter-spacing: 0.02em;
+}
+
+.uc-session-time {
+  font-family: "Orbitron", sans-serif;
+  font-size: 10px;
+  color: var(--grey);
+  letter-spacing: 0.06em;
+}
+
+/* live pip */
+.uc-live-pip {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: livePulse 1.8s ease-in-out infinite;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .uc-session-label {
+    min-width: 70px;
+    font-size: 10px;
+  }
+  .uc-session-day {
+    font-size: 11px;
+  }
+  .uc-session-time {
+    font-size: 9px;
+  }
+  .uc-session {
+    padding: 6px 12px;
   }
 }

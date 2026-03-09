@@ -27,6 +27,97 @@ const circuitImages = {
   interlagos: "/assets/Brazilian.png",
 };
 
+function fmtSession(dateStr, timeStr) {
+  if (!dateStr) return null;
+  const dt = new Date(`${dateStr}T${timeStr || "00:00:00Z"}`);
+  const day = dt.toLocaleDateString("en-IN", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  });
+  const time = timeStr
+    ? dt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+    : null;
+  return { day, time };
+}
+
+// Build the ordered session list for a race object.
+// The Ergast API returns FirstPractice, SecondPractice, ThirdPractice,
+// Qualifying, Sprint, and SprintQualifying inside each race object.
+function buildSessions(race) {
+  const isSprint = !!race.Sprint;
+
+  const sessions = [];
+
+  // Practice 1
+  if (race.FirstPractice)
+    sessions.push({
+      label: "FP1",
+      ...fmtSession(race.FirstPractice.date, race.FirstPractice.time),
+    });
+
+  // Sprint weekend: FP2 is replaced by Sprint Qualifying / Shootout
+  if (isSprint) {
+    if (race.SecondPractice)
+      sessions.push({
+        label: "Sprint Quali",
+        ...fmtSession(race.SecondPractice.date, race.SecondPractice.time),
+      });
+    sessions.push({
+      label: "Sprint",
+      ...fmtSession(race.Sprint.date, race.Sprint.time),
+    });
+    if (race.ThirdPractice)
+      sessions.push({
+        label: "FP2",
+        ...fmtSession(race.ThirdPractice.date, race.ThirdPractice.time),
+      });
+  } else {
+    if (race.SecondPractice)
+      sessions.push({
+        label: "FP2",
+        ...fmtSession(race.SecondPractice.date, race.SecondPractice.time),
+      });
+    if (race.ThirdPractice)
+      sessions.push({
+        label: "FP3",
+        ...fmtSession(race.ThirdPractice.date, race.ThirdPractice.time),
+      });
+  }
+
+  // Qualifying
+  if (race.Qualifying)
+    sessions.push({
+      label: "Qualifying",
+      ...fmtSession(race.Qualifying.date, race.Qualifying.time),
+    });
+
+  // Race
+  sessions.push({
+    label: "Race",
+    isRace: true,
+    ...fmtSession(race.date, race.time),
+  });
+
+  return sessions;
+}
+
+// Is this session in the past?
+function isPast(dateStr, timeStr) {
+  if (!dateStr) return false;
+  return new Date(`${dateStr}T${timeStr || "00:00:00Z"}`) < new Date();
+}
+
+// Is this session happening now (within 3h window)?
+function isLive(dateStr, timeStr) {
+  if (!dateStr || !timeStr) return false;
+  const start = new Date(`${dateStr}T${timeStr}`);
+  const end = new Date(start.getTime() + 3 * 60 * 60 * 1000);
+  const now = new Date();
+  return now >= start && now <= end;
+}
+
+// ── Component ─────────────────────────────────────────────────
 const UpcomingRaces = ({ season = 2026 }) => {
   const [upcoming, setUpcoming] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,16 +130,11 @@ const UpcomingRaces = ({ season = 2026 }) => {
         );
         const data = await res.json();
         const races = data?.MRData?.RaceTable?.Races || [];
-
         const now = new Date();
 
-        // Compare the actual race start time (UTC) against right now —
-        // not just the date. This prevents a completed race from still
-        // showing as "upcoming" on race day after it has finished.
-        // Add a 3-hour buffer so the card clears well after the chequered flag.
         const index = races.findIndex((r) => {
           const raceEnd = new Date(`${r.date}T${r.time || "14:00:00"}`);
-          raceEnd.setHours(raceEnd.getHours() + 3); // ~race duration buffer
+          raceEnd.setHours(raceEnd.getHours() + 3);
           return raceEnd > now;
         });
 
@@ -93,28 +179,65 @@ const UpcomingRaces = ({ season = 2026 }) => {
         {upcoming.map((race, i) => {
           const img =
             circuitImages[race.Circuit.circuitId] || "/assets/default.jpg";
-          const localTime = race.time
-            ? new Date(`${race.date}T${race.time}`).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : null;
+          const sessions = buildSessions(race);
+          const isSprint = !!race.Sprint;
 
           return (
             <div key={race.round} className="upcoming-card">
               {i === 0 && <div className="uc-next-tag">Next Race ▶</div>}
+
+              {/* Circuit image */}
               <img src={img} alt={race.raceName} className="circuit-image" />
-              <div className="info">
-                <div className="round">Round {race.round}</div>
+
+              {/* Race header info */}
+              <div className="uc-info">
+                <div className="uc-round-row">
+                  <span className="round">Round {race.round}</span>
+                  {isSprint && <span className="uc-sprint-badge">Sprint</span>}
+                </div>
                 <div className="name">{race.raceName}</div>
                 <div className="location">
                   {race.Circuit.Location.locality},{" "}
                   {race.Circuit.Location.country}
                 </div>
-                <div className="date">
-                  {race.date}
-                  {localTime ? ` · ${localTime} IST` : ""}
-                </div>
+              </div>
+
+              {/* Session schedule */}
+              <div className="uc-sessions">
+                {sessions.map((s) => {
+                  const past = isPast(
+                    s.label === "Race"
+                      ? race.date
+                      : race.FirstPractice?.date, // fallback — state determined by label
+                    s.time,
+                  );
+                  const live = isLive(
+                    s.label === "Race" ? race.date : null,
+                    s.label === "Race" ? race.time : null,
+                  );
+
+                  return (
+                    <div
+                      key={s.label}
+                      className={[
+                        "uc-session",
+                        s.isRace ? "uc-session--race" : "",
+                        live ? "uc-session--live" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      <span className="uc-session-label">{s.label}</span>
+                      <span className="uc-session-datetime">
+                        <span className="uc-session-day">{s.day}</span>
+                        {s.time && (
+                          <span className="uc-session-time">{s.time}</span>
+                        )}
+                      </span>
+                      {live && <span className="uc-live-pip" />}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );
