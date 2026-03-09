@@ -5,37 +5,27 @@ import UpcomingRaces from "./Components/UpcomingRaces";
 import LiveStream from "./Components/LiveStream";
 import Highlights from "./Components/Highlights";
 
-// ── RSS sources — tried in order until one succeeds ──────────
-// All fetched via allorigins.win (same CORS proxy as Highlights)
+// ── RSS sources ───────────────────────────────────────────────
 const RSS_SOURCES = [
   {
     name: "BBC Sport F1",
     url: "https://feeds.bbci.co.uk/sport/formula1/rss.xml",
   },
-  {
-    name: "Autosport",
-    url: "https://www.autosport.com/rss/f1/news/",
-  },
-  {
-    name: "Sky Sports F1",
-    url: "https://www.skysports.com/rss/12433",
-  },
+  { name: "Autosport", url: "https://www.autosport.com/rss/f1/news/" },
+  { name: "Sky Sports F1", url: "https://www.skysports.com/rss/12433" },
 ];
 
 function proxyUrl(rssUrl) {
   return `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
 }
 
-// Parse an RSS/Atom XML string into plain article objects
 function parseRSS(xmlString) {
   const doc = new DOMParser().parseFromString(xmlString, "text/xml");
   const items = Array.from(doc.querySelectorAll("item, entry"));
-
   return items
     .slice(0, 12)
     .map((item) => {
       const title = item.querySelector("title")?.textContent?.trim() || "";
-      // link can be a tag text or an attribute
       const linkEl = item.querySelector("link");
       const link =
         linkEl?.getAttribute("href") || linkEl?.textContent?.trim() || "#";
@@ -46,10 +36,9 @@ function parseRSS(xmlString) {
       const desc =
         item
           .querySelector("description, summary")
-          ?.textContent?.replace(/<[^>]+>/g, "") // strip any embedded HTML
+          ?.textContent?.replace(/<[^>]+>/g, "")
           ?.trim()
-          ?.slice(0, 120) || "";
-
+          ?.slice(0, 110) || "";
       return { title, link, pubDate, desc };
     })
     .filter((a) => a.title && a.link !== "#");
@@ -65,13 +54,24 @@ function timeAgo(dateStr) {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-/* ── News Ticker ─────────────────────────────────────────── */
-function NewsTicker() {
+/* ── Collapsible News Bar ────────────────────────────────── */
+function NewsBar() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [source, setSource] = useState("");
-  const [hovered, setHovered] = useState(null);
-  const listRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const panelRef = useRef(null);
+
+  // Close on outside click
+  useEffect(() => {
+    function onOutside(e) {
+      if (open && panelRef.current && !panelRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onOutside);
+    return () => document.removeEventListener("mousedown", onOutside);
+  }, [open]);
 
   useEffect(() => {
     async function fetchNews() {
@@ -90,68 +90,88 @@ function NewsTicker() {
           continue;
         }
       }
-      // All sources failed — show nothing silently
-      setArticles([]);
     }
     fetchNews().finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <div className="news-ticker">
-        <div className="news-ticker__header">
-          <span className="news-ticker__label">F1 News</span>
-        </div>
-        <div className="news-ticker__list">
-          {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className="news-ticker__skeleton shimmer" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!articles.length) return null;
+  // Don't render at all if fetch failed
+  if (!loading && !articles.length) return null;
 
   return (
-    <div className="news-ticker">
-      {/* header */}
-      <div className="news-ticker__header">
-        <span className="news-ticker__dot" />
-        <span className="news-ticker__label">Latest F1 News</span>
-        <span className="news-ticker__source">{source}</span>
-      </div>
+    <div className="nb-wrap" ref={panelRef}>
+      {/* ── Collapsed bar — always visible ── */}
+      <button
+        className={`nb-bar ${open ? "nb-bar--open" : ""}`}
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-label="Toggle F1 news"
+      >
+        <span className="nb-bar__left">
+          <span className="nb-bar__dot" />
+          <span className="nb-bar__label">Latest F1 News</span>
+          {source && <span className="nb-bar__source">{source}</span>}
+        </span>
 
-      {/* scrollable list */}
-      <div className="news-ticker__list" ref={listRef}>
-        {articles.map((a, i) => (
-          <a
-            key={i}
-            href={a.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`news-ticker__item ${hovered === i ? "news-ticker__item--hovered" : ""}`}
-            onMouseEnter={() => setHovered(i)}
-            onMouseLeave={() => setHovered(null)}
-          >
-            <div className="news-ticker__item-inner">
-              <span className="news-ticker__index">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <div className="news-ticker__content">
-                <span className="news-ticker__title">{a.title}</span>
-                {a.desc && hovered === i && (
-                  <span className="news-ticker__desc">{a.desc}…</span>
-                )}
-              </div>
-              {a.pubDate && (
-                <span className="news-ticker__age">{timeAgo(a.pubDate)}</span>
-              )}
-            </div>
-            {hovered === i && <span className="news-ticker__arrow">→</span>}
-          </a>
-        ))}
-      </div>
+        {/* Scrolling headline preview when closed */}
+        {!open && !loading && articles.length > 0 && (
+          <span className="nb-bar__preview" aria-hidden="true">
+            <span className="nb-bar__preview-inner">
+              {articles.slice(0, 5).map((a, i) => (
+                <span key={i} className="nb-bar__preview-item">
+                  <span className="nb-bar__preview-dot">●</span>
+                  {a.title}
+                </span>
+              ))}
+            </span>
+          </span>
+        )}
+
+        {loading && <span className="nb-bar__loading">Loading news…</span>}
+
+        <span
+          className={`nb-bar__chevron ${open ? "nb-bar__chevron--up" : ""}`}
+        >
+          ▾
+        </span>
+      </button>
+
+      {/* ── Expanded panel ── */}
+      {open && (
+        <div className="nb-panel">
+          <div className="nb-panel__list">
+            {articles.map((a, i) => (
+              <a
+                key={i}
+                href={a.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nb-article"
+              >
+                <span className="nb-article__num">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="nb-article__body">
+                  <span className="nb-article__title">{a.title}</span>
+                  {a.desc && (
+                    <span className="nb-article__desc">{a.desc}…</span>
+                  )}
+                </div>
+                <div className="nb-article__meta">
+                  {a.pubDate && (
+                    <span className="nb-article__age">
+                      {timeAgo(a.pubDate)}
+                    </span>
+                  )}
+                  <span className="nb-article__arrow">→</span>
+                </div>
+              </a>
+            ))}
+          </div>
+          <div className="nb-panel__footer">
+            {source} · {articles.length} articles
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -179,7 +199,7 @@ function NextRaceCard() {
         );
         if (next) setRace(next);
       } catch (e) {
-        console.error("NextRaceCard fetch error:", e);
+        console.error("NextRaceCard:", e);
       }
     }
     fetchNext();
@@ -318,18 +338,17 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── News ticker — left side ── */}
-        <NewsTicker />
-
-        {/* ── Next race card — right side ── */}
+        {/* next race card — right side of hero */}
         <NextRaceCard />
 
-        {/* scroll hint */}
         <div className="hero-scroll-hint">
           <span className="hero-scroll-line" />
           <span className="hero-scroll-label">Scroll</span>
         </div>
       </section>
+
+      {/* ── NEWS BAR — between hero and rankings ─────────────── */}
+      <NewsBar />
 
       {/* ── RANKINGS ─────────────────────────────────────────── */}
       <section id="rankings" className="home-section container">
