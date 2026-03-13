@@ -6,7 +6,7 @@ const streamSources = [
     id: 1,
     name: "Server 1",
     type: "iframe",
-    url: "https://hakunamatata5.org/hakunamatata5.html",
+    url: "https://hakunamatata5.org/sky-main-event/clean.html",
   },
   {
     id: 2,

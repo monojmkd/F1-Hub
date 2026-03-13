@@ -16,8 +16,8 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 // ─────────────────────────────────────────────────────────────────
 
 const OPENF1 = "https://api.openf1.org/v1";
-const SVG_W = 600;
-const SVG_H = 460;
+const SVG_W = 480;
+const SVG_H = 360;
 const PAD = 44;
 const POLL_MS = 3000;
 
@@ -313,6 +313,131 @@ function TrackMap({ drivers, positions, trackPoints, status }) {
 }
 
 // ─────────────────────────────────────────────────────────────────
+//  SUB-COMPONENT: Weather Card
+// ─────────────────────────────────────────────────────────────────
+const FLAG_COLOR = {
+  GREEN: "#22c55e",
+  YELLOW: "#fbbf24",
+  RED: "#E8002D",
+  BLUE: "#3b82f6",
+  BLACK: "#555",
+  CHEQUERED: "#eee",
+  CLEAR: "#22c55e",
+  SC: "#fbbf24",
+  VSC: "#fbbf24",
+};
+const FLAG_LABEL = {
+  GREEN: "GRN",
+  YELLOW: "YEL",
+  RED: "RED",
+  BLUE: "BLU",
+  BLACK: "BLK",
+  CHEQUERED: "END",
+  CLEAR: "CLR",
+  SC: "SC",
+  VSC: "VSC",
+};
+
+function WeatherCard({ weather }) {
+  return (
+    <div className="ltm-wx-card">
+      <span className="ltm-ic-label">WEATHER</span>
+      {!weather ? (
+        <span className="ltm-ic-empty">No data</span>
+      ) : (
+        <>
+          <span
+            className={`ltm-wx-condition ${weather.rainfall > 0 ? "ltm-wx-condition--wet" : "ltm-wx-condition--dry"}`}
+          >
+            {weather.rainfall > 0 ? "🌧 WET" : "☀ DRY"}
+          </span>
+          <div className="ltm-wx-grid">
+            <div className="ltm-wx-item">
+              <span className="ltm-wx-val">
+                {weather.air_temperature ?? "—"}°
+              </span>
+              <span className="ltm-wx-key">AIR</span>
+            </div>
+            <div className="ltm-wx-item">
+              <span className="ltm-wx-val">
+                {weather.track_temperature ?? "—"}°
+              </span>
+              <span className="ltm-wx-key">TRACK</span>
+            </div>
+            <div className="ltm-wx-item">
+              <span className="ltm-wx-val">{weather.humidity ?? "—"}%</span>
+              <span className="ltm-wx-key">HUMID</span>
+            </div>
+            <div className="ltm-wx-item">
+              <span className="ltm-wx-val">
+                {weather.wind_speed ?? "—"}
+                <span className="ltm-wx-unit"> km/h</span>
+              </span>
+              <span className="ltm-wx-key">
+                WIND{" "}
+                {weather.wind_direction != null
+                  ? `${weather.wind_direction}°`
+                  : ""}
+              </span>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+//  SUB-COMPONENT: Race Control Feed
+// ─────────────────────────────────────────────────────────────────
+function RaceControlFeed({ messages }) {
+  return (
+    <div className="ltm-rc-card">
+      <span className="ltm-ic-label">RACE CONTROL</span>
+      {!messages.length ? (
+        <span className="ltm-ic-empty">No messages</span>
+      ) : (
+        <div className="ltm-rc-list">
+          {messages.map((m, i) => {
+            const raw = (m.flag || m.category || "")
+              .toUpperCase()
+              .replace(/[\s-]/g, "_");
+            const chipColor = FLAG_COLOR[raw] || "#555";
+            const chipLabel = FLAG_LABEL[raw] || raw.slice(0, 3) || "—";
+            const isDark = chipColor === "#eee" || chipColor === "#fbbf24";
+            const time = m.date
+              ? new Date(m.date).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })
+              : null;
+            return (
+              <div
+                key={i}
+                className={`ltm-rc-row${i === 0 ? " ltm-rc-row--latest" : ""}`}
+              >
+                <span
+                  className="ltm-rc-chip"
+                  style={{
+                    background: chipColor,
+                    color: isDark ? "#111" : "#fff",
+                  }}
+                >
+                  {chipLabel}
+                </span>
+                <span className="ltm-rc-msg">{m.message}</span>
+                {time && <span className="ltm-rc-time">{time}</span>}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
 //  PARENT — fetches all data, owns state, renders both panels
 // ─────────────────────────────────────────────────────────────────
 export default function LiveTrackMap() {
@@ -326,6 +451,8 @@ export default function LiveTrackMap() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [stints, setStints] = useState({});
   const [lapInfo, setLapInfo] = useState("");
+  const [weather, setWeather] = useState(null);
+  const [raceControl, setRaceControl] = useState([]);
   const [status, setStatus] = useState("init");
   const [lastUpdate, setLastUpdate] = useState(null);
   const trackRef = useRef([]);
@@ -378,13 +505,15 @@ export default function LiveTrackMap() {
 
     try {
       // Run all fetches in parallel
-      const [locRes, posRes, intRes, stintRes, lapRes] =
+      const [locRes, posRes, intRes, stintRes, lapRes, wxRes, rcRes] =
         await Promise.allSettled([
           fetch(`${OPENF1}/location?session_key=${sessionKey}&date>=${since}`),
           fetch(`${OPENF1}/position?session_key=${sessionKey}&date>=${since}`),
           fetch(`${OPENF1}/intervals?session_key=${sessionKey}&date>=${since}`),
           fetch(`${OPENF1}/stints?session_key=${sessionKey}`),
           fetch(`${OPENF1}/laps?session_key=${sessionKey}&date>=${since}`),
+          fetch(`${OPENF1}/weather?session_key=${sessionKey}`),
+          fetch(`${OPENF1}/race_control?session_key=${sessionKey}`),
         ]);
 
       // ── Location → track pts + dot positions ──────────────
@@ -459,6 +588,26 @@ export default function LiveTrackMap() {
           const maxLap = Math.max(...latest.map((l) => l.lap_number || 0));
           if (maxLap) setLapInfo(`LAP ${maxLap}`);
         }
+      }
+
+      // ── Weather ───────────────────────────────────────────
+      if (wxRes.status === "fulfilled") {
+        const wx = await wxRes.value.json();
+        if (wx?.length)
+          setWeather(
+            [...wx].sort((a, b) => new Date(b.date) - new Date(a.date))[0],
+          );
+      }
+
+      // ── Race control ──────────────────────────────────────
+      if (rcRes.status === "fulfilled") {
+        const rc = await rcRes.value.json();
+        if (rc?.length)
+          setRaceControl(
+            [...rc]
+              .sort((a, b) => new Date(b.date) - new Date(a.date))
+              .slice(0, 8),
+          );
       }
 
       // ── Build sorted leaderboard ──────────────────────────
@@ -546,9 +695,9 @@ export default function LiveTrackMap() {
         </div>
       </div>
 
-      {/* ── Two-panel body ── */}
+      {/* ── Three-panel body ── */}
       <div className="ltm-body">
-        {/* LEFT — Leaderboard */}
+        {/* LEFT — Timing Tower */}
         <div className="ltm-panel ltm-panel--left">
           <div className="ltm-panel-label">TIMING TOWER</div>
           <Leaderboard
@@ -561,8 +710,8 @@ export default function LiveTrackMap() {
           />
         </div>
 
-        {/* RIGHT — Track Map */}
-        <div className="ltm-panel ltm-panel--right">
+        {/* MIDDLE — Track Map */}
+        <div className="ltm-panel ltm-panel--mid">
           <div className="ltm-panel-label">TRACK MAP</div>
           <div className="ltm-canvas-wrap">
             <TrackMap
@@ -592,6 +741,12 @@ export default function LiveTrackMap() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* RIGHT — Weather (top) + Race Control (bottom) */}
+        <div className="ltm-panel--info">
+          <WeatherCard weather={weather} />
+          <RaceControlFeed messages={raceControl} />
         </div>
       </div>
 
