@@ -3497,7 +3497,7 @@ footer .container > div p[style*="color: black"] {
 }
 @media (max-width: 480px) {
   .ltm-lb-row {
-    grid-template-columns: 22px 3px 34px 1fr auto;
+    /* grid-template-columns: 22px 3px 34px 1fr auto; */
     gap: 6px;
     padding: 6px 10px;
   }
