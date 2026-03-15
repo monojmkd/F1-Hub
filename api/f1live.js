@@ -35,7 +35,9 @@ const TOPICS = [
 
 function decompressZlib(b64) {
   try {
-    return JSON.parse(zlib.inflateRawSync(Buffer.from(b64, "base64")).toString());
+    return JSON.parse(
+      zlib.inflateRawSync(Buffer.from(b64, "base64")).toString(),
+    );
   } catch {
     return null;
   }
@@ -75,7 +77,7 @@ function negotiate() {
             reject(new Error("Negotiate parse failed: " + e.message));
           }
         });
-      }
+      },
     );
     req.on("error", reject);
     req.setTimeout(6000, () => {
@@ -100,17 +102,16 @@ function getSnapshot(token, cookie) {
     const finish = (data) => {
       if (!settled) {
         settled = true;
-        try { ws.close(); } catch {}
+        try {
+          ws.close();
+        } catch {}
         clearTimeout(giveUp);
         resolve(data);
       }
     };
 
     // 8s hard timeout — Vercel hobby functions have a 10s limit
-    const giveUp = setTimeout(
-      () => finish(null),
-      8000
-    );
+    const giveUp = setTimeout(() => finish(null), 8000);
 
     const ws = new WebSocket(wsUrl, {
       headers: {
@@ -127,7 +128,7 @@ function getSnapshot(token, cookie) {
           M: "Subscribe",
           A: [TOPICS],
           I: 1,
-        })
+        }),
       );
     });
 
@@ -176,9 +177,10 @@ function normalise(snap) {
     out.drivers[n] = {
       code: d.Tla || d.BroadcastName || `#${n}`,
       color: d.TeamColour ? `#${d.TeamColour}` : "#888888",
-      name: `${d.FirstName || ""} ${d.LastName || ""}`.trim() || d.FullName || "",
+      name:
+        `${d.FirstName || ""} ${d.LastName || ""}`.trim() || d.FullName || "",
       team: d.TeamName || "",
-      line: d.Line ?? 99,  // grid order
+      line: d.Line ?? 99, // grid order
     };
   });
 
@@ -208,7 +210,10 @@ function normalise(snap) {
   if (ts) {
     out.trackStatus = ts.Message || "";
     // Status "0" means no session; any other value means something is live
-    out.live = ts.Status !== "0" && ts.Status != null && Object.keys(out.drivers).length > 0;
+    out.live =
+      ts.Status !== "0" &&
+      ts.Status != null &&
+      Object.keys(out.drivers).length > 0;
   }
 
   // ── TimingAppData → current tire compound per driver ──────────────────────
@@ -248,7 +253,9 @@ function normalise(snap) {
     const latest = posData?.Position?.[posData.Position.length - 1];
     if (latest?.Entries) {
       out.positions = Object.entries(latest.Entries)
-        .filter(([, e]) => e.Status === "OnTrack" || e.Status === "OnTrackRetired")
+        .filter(
+          ([, e]) => e.Status === "OnTrack" || e.Status === "OnTrackRetired",
+        )
         .map(([num, e]) => ({
           driverNum: parseInt(num),
           x: e.X,
@@ -287,6 +294,51 @@ function normalise(snap) {
   return out;
 }
 
+// ── Streaming status check — fast lightweight gate ───────────────────────────
+// Returns true only when F1 confirms a session is actively streaming.
+// Saves the negotiate + WebSocket attempt entirely when nothing is live.
+
+const OFFLINE_RESPONSE = {
+  live: false,
+  sessionName: "",
+  sessionType: "",
+  lapInfo: "",
+  drivers: {},
+  leaderboard: [],
+  positions: [],
+  weather: null,
+  raceControl: [],
+  trackStatus: "",
+};
+
+function isStreamingLive() {
+  return new Promise((resolve) => {
+    const req = https.get(
+      "https://livetiming.formula1.com/static/StreamingStatus.json",
+      { headers: { "User-Agent": "Mozilla/5.0", "Cache-Control": "no-cache" } },
+      (res) => {
+        let raw = "";
+        res.on("data", (d) => (raw += d));
+        res.on("end", () => {
+          try {
+            const body = JSON.parse(raw);
+            // Status is "Available" when a session is live
+            resolve(body.Status === "Available");
+          } catch {
+            // If we can't parse it, assume offline to avoid a pointless negotiate
+            resolve(false);
+          }
+        });
+      },
+    );
+    req.on("error", () => resolve(false));
+    req.setTimeout(3000, () => {
+      req.destroy();
+      resolve(false);
+    });
+  });
+}
+
 // ── Vercel handler ────────────────────────────────────────────────────────────
 
 module.exports = async function handler(req, res) {
@@ -297,6 +349,13 @@ module.exports = async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
+  // ── Gate: check streaming status before attempting SignalR ────────────────
+  const live = await isStreamingLive();
+  if (!live) {
+    // No active session — return immediately, no negotiate, no timeout in console
+    return res.status(200).json({ ...OFFLINE_RESPONSE, ts: Date.now() });
+  }
+
   try {
     const { token, cookie } = await negotiate();
     const snapshot = await getSnapshot(token, cookie);
@@ -305,14 +364,9 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error("[f1live]", err.message);
     return res.status(200).json({
-      live: false,
+      ...OFFLINE_RESPONSE,
       error: err.message,
-      sessionName: "",
-      drivers: {},
-      leaderboard: [],
-      positions: [],
-      weather: null,
-      raceControl: [],
+      ts: Date.now(),
     });
   }
 };

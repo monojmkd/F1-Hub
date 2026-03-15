@@ -152,7 +152,27 @@ function Leaderboard({ drivers, leaderboard, sessionType, lapInfo }) {
 // ─────────────────────────────────────────────────────────────────
 //  Track Map SVG
 // ─────────────────────────────────────────────────────────────────
-function TrackMap({ drivers, positions, trackPoints, status }) {
+function TrackMap({ drivers, positions, trackPoints, status, sessionName }) {
+  // Offline or error — show a clean placeholder, no empty SVG
+  if (status === "offline" || status === "error") {
+    return (
+      <div className="ltm-map-offline">
+        <div className="ltm-map-offline-icon">⬡</div>
+        <p className="ltm-map-offline-title">
+          {status === "error" ? "Map Unavailable" : "No Live Session"}
+        </p>
+        <p className="ltm-map-offline-sub">
+          {status === "error"
+            ? "Could not connect to timing stream"
+            : "Track map streams during live sessions only"}
+        </p>
+        {sessionName && status === "offline" && (
+          <p className="ltm-map-offline-last">Last: {sessionName}</p>
+        )}
+      </div>
+    );
+  }
+
   const norm = makeNorm(trackPoints);
   const trackPath =
     trackPoints.length > 2
@@ -163,16 +183,6 @@ function TrackMap({ drivers, positions, trackPoints, status }) {
           })
           .join(" ") + " Z"
       : null;
-
-  if (status === "error") {
-    return (
-      <div className="ltm-unavailable">
-        <span className="ltm-unavail-icon">⚑</span>
-        <p>Map unavailable</p>
-        <p className="ltm-lb-sub">Could not connect to timing stream</p>
-      </div>
-    );
-  }
 
   return (
     <svg
@@ -445,9 +455,13 @@ export default function LiveTrackMap() {
 
   useEffect(() => {
     poll();
-    pollerRef.current = setInterval(poll, POLL_MS);
+    // Only keep polling during a live session.
+    // When offline, a single fetch is enough — no point hammering the API.
+    // Check again every 5 minutes in case a session goes live.
+    const rate = status === "live" ? POLL_MS : 5 * 60 * 1000;
+    pollerRef.current = setInterval(poll, rate);
     return () => clearInterval(pollerRef.current);
-  }, [poll]);
+  }, [poll, status]);
 
   // ── Status badge ──────────────────────────────────────────────
   const badgeCls =
@@ -512,6 +526,7 @@ export default function LiveTrackMap() {
               positions={positions}
               trackPoints={trackPoints}
               status={status}
+              sessionName={sessionName}
             />
             {positions.length > 0 && (
               <div className="ltm-legend">
