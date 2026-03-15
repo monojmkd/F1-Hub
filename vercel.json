@@ -1,0 +1,5 @@
+{
+  "functions": {
+    "api/f1live.js": { "maxDuration": 15 }
+  }
+}
