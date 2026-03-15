@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
-
 const streamSources = [
   {
     id: 1,
@@ -20,18 +19,21 @@ const streamSources = [
     type: "iframe",
     url: "https://embednow.top/embed/f1/2026/brazil/race",
   },
+  {
+    id: 4,
+    name: "Server 4",
+    type: "iframe",
+    url: "https://streamfree.app/embed/racing/skyf1?server=origin&quality=1080p&category=racing",
+  },
 ];
-
 const LiveStream = () => {
   const videoRef = useRef(null);
   const [active, setActive] = useState(streamSources[0]);
   const [locked, setLocked] = useState(true);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     setLoading(true);
     if (!active) return;
-
     if (active.type === "hls" && videoRef.current) {
       // init hls.js
       if (Hls.isSupported()) {
@@ -57,17 +59,14 @@ const LiveStream = () => {
       setTimeout(() => setLoading(false), 600);
     }
   }, [active]);
-
   const wrapperModeClass =
     active?.type === "iframe" ? "iframeTall" : "hlsNormal";
-
   return (
     <section className="live-section">
       <h2 className="section-title">Live Stream</h2>
       <p className="subtle">
         Choose a server — unlock to interact with the player.
       </p>
-
       <div className="live-container">
         <div className={`player-wrapper ${wrapperModeClass}`}>
           {active.type === "hls" ? (
@@ -93,7 +92,6 @@ const LiveStream = () => {
           {/* click blocker overlay (covers iframe/video to prevent accidental clicks) */}
           <div className={`click-blocker ${locked ? "active" : ""}`} />
         </div>
-
         {/* absolute-positioned unlock button to avoid being pushed */}
         <div className="player-controls">
           <p>Unlock player to interact with player</p>
@@ -101,7 +99,6 @@ const LiveStream = () => {
             {locked ? "Unlock Player" : "Lock Player"}
           </button>
         </div>
-
         {/* server buttons */}
         <div className="server-switch">
           {streamSources.map((s) => (
@@ -118,11 +115,9 @@ const LiveStream = () => {
             </button>
           ))}
         </div>
-
         {loading && <div className="stream-loading">⏳ Loading stream...</div>}
       </div>
     </section>
   );
 };
-
 export default LiveStream;
