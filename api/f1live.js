@@ -49,11 +49,19 @@ function safeFloat(v) {
 }
 
 // ── Step 1: negotiate ─────────────────────────────────────────────────────────
+// Pass the F1 login-session cookie from env so the server authenticates us.
+// Free account gives: timing, weather, race control.
+// F1 TV subscription needed for: Position.z (car X/Y coordinates).
 
 function negotiate() {
   return new Promise((resolve, reject) => {
     const hub = encodeURIComponent(JSON.stringify([{ name: "Streaming" }]));
     const url = `${SIGNALR}/negotiate?connectionData=${hub}&clientProtocol=1.5`;
+
+    // Build auth cookie — login-session from env + any server-set cookies merged below
+    const loginCookie = process.env.F1_LOGIN_SESSION
+      ? `login-session=${process.env.F1_LOGIN_SESSION}`
+      : "";
 
     const req = https.get(
       url,
@@ -61,6 +69,7 @@ function negotiate() {
         headers: {
           "User-Agent": "BestHTTP",
           "Accept-Encoding": "gzip, identity",
+          ...(loginCookie ? { Cookie: loginCookie } : {}),
         },
       },
       (res) => {
@@ -69,8 +78,12 @@ function negotiate() {
         res.on("end", () => {
           try {
             const body = JSON.parse(raw);
-            const cookie = (res.headers["set-cookie"] || [])
+            // Merge server-set cookies with our auth cookie
+            const serverCookies = (res.headers["set-cookie"] || [])
               .map((c) => c.split(";")[0])
+              .join("; ");
+            const cookie = [loginCookie, serverCookies]
+              .filter(Boolean)
               .join("; ");
             resolve({ token: body.ConnectionToken, cookie });
           } catch (e) {
@@ -80,7 +93,7 @@ function negotiate() {
       },
     );
     req.on("error", reject);
-    req.setTimeout(6000, () => {
+    req.setTimeout(8000, () => {
       req.destroy();
       reject(new Error("Negotiate timeout"));
     });
@@ -110,8 +123,8 @@ function getSnapshot(token, cookie) {
       }
     };
 
-    // 8s hard timeout — Vercel hobby functions have a 10s limit
-    const giveUp = setTimeout(() => finish(null), 8000);
+    // 10s hard timeout
+    const giveUp = setTimeout(() => finish(null), 10000);
 
     const ws = new WebSocket(wsUrl, {
       headers: {
