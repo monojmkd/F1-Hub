@@ -31,6 +31,12 @@ const streamSources = [
     type: "iframe",
     url: "https://junkieembeds.pages.dev/embed/f1-on-apple",
   },
+  {
+    id: 6,
+    name: "Server 6 (Sky Sports 2)",
+    type: "iframe",
+    url: "https://junkieembeds.pages.dev/embed/f1-fuck-you-sky",
+  },
 ];
 const LiveStream = () => {
   const videoRef = useRef(null);
@@ -41,7 +47,6 @@ const LiveStream = () => {
     setLoading(true);
     if (!active) return;
     if (active.type === "hls" && videoRef.current) {
-      // init hls.js
       if (Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(active.url);
@@ -95,17 +100,14 @@ const LiveStream = () => {
               frameBorder="0"
             />
           )}
-          {/* click blocker overlay (covers iframe/video to prevent accidental clicks) */}
           <div className={`click-blocker ${locked ? "active" : ""}`} />
         </div>
-        {/* absolute-positioned unlock button to avoid being pushed */}
         <div className="player-controls">
           <p>Unlock player to interact with player</p>
           <button className="lock-toggle" onClick={() => setLocked(!locked)}>
             {locked ? "Unlock Player" : "Lock Player"}
           </button>
         </div>
-        {/* server buttons */}
         <div className="server-switch">
           {streamSources.map((s) => (
             <button
