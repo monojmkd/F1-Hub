@@ -17,13 +17,19 @@ const streamSources = [
     id: 3,
     name: "Server 3",
     type: "iframe",
-    url: "https://embednow.top/embed/f1/2026/brazil/race",
+    url: "https://sportspass.fit/f1/f1streams.html",
   },
   {
     id: 4,
     name: "Server 4",
     type: "iframe",
     url: "https://streamfree.app/embed/racing/skyf1?server=origin&quality=1080p&category=racing",
+  },
+  {
+    id: 5,
+    name: "Server 5 (AppleTV)",
+    type: "iframe",
+    url: "https://junkieembeds.pages.dev/embed/f1-on-apple",
   },
 ];
 const LiveStream = () => {
@@ -83,7 +89,7 @@ const LiveStream = () => {
               src={active.url}
               title={`live-${active.id}`}
               className="live-iframe"
-              allow="encrypted-media; picture-in-picture"
+              allow="autoplay; encrypted-media; picture-in-picture"
               allowFullScreen
               scrolling="no"
               frameBorder="0"
