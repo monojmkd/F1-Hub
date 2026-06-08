@@ -4015,3 +4015,142 @@ footer .container > div p[style*="color: black"] {
   opacity: 0.6;
   margin: 4px 0 0;
 }
+
+/* race weekend hub */
+.race-weekend-hub {
+  margin-top: 20px;
+}
+
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.hub-card {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.hub-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.hub-card h4 {
+  font-size: 1.5rem;
+  margin: 8px 0;
+}
+
+.hub-card p {
+  font-size: 0.95rem;
+  margin: 4px 0;
+}
+
+.track-image {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+  margin: 8px 0;
+}
+
+.track-stats {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.track-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.track-row:last-child {
+  border-bottom: none;
+}
+
+.weather-temp {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ff1801;
+  margin-bottom: 8px;
+}
+
+.weather-details {
+  margin-top: 10px;
+}
+
+.weather-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.weather-condition {
+  margin-top: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.championship-card {
+  text-align: center;
+}
+
+.leader-image {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  margin: 5px auto;
+  display: block;
+}
+
+.leader-points {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ff1801;
+  margin: 6px 0;
+}
+
+.battle-list {
+  margin-top: 10px;
+}
+
+.battle-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.race-badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  border-radius: 999px;
+}
+
+@media (max-width: 900px) {
+  .hub-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .track-image {
+    height: 120px;
+  }
+
+  .leader-image {
+    width: 90px;
+    height: 90px;
+  }
+}

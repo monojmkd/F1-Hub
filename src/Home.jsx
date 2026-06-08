@@ -5,6 +5,7 @@ import UpcomingRaces from "./Components/UpcomingRaces";
 import LiveStream from "./Components/LiveStream";
 import Highlights from "./Components/Highlights";
 import LiveTrackMap from "./Components/LiveTrackMap";
+import RaceWeekendHub from "./Components/RaceWeekendHub";
 
 // ── RSS sources ───────────────────────────────────────────────
 const RSS_SOURCES = [
@@ -361,8 +362,12 @@ export default function Home() {
       </section>
 
       {/* ── LIVE TRACK MAP ───────────────────────────────────── */}
-      <section id="trackmap" className="home-section container">
+      {/* <section id="trackmap" className="home-section container">
         <LiveTrackMap />
+      </section> */}
+
+      <section className="home-section container">
+        <RaceWeekendHub />
       </section>
 
       {/* ── LIVE STREAM ──────────────────────────────────────── */}
