@@ -4146,11 +4146,11 @@ footer .container > div p[style*="color: black"] {
   }
 
   .track-image {
-    height: 120px;
+    height: 150px;
   }
 
   .leader-image {
-    width: 90px;
-    height: 90px;
+    width: 120px;
+    height: 120px;
   }
 }
