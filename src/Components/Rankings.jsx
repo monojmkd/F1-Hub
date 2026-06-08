@@ -332,6 +332,13 @@ const Rankings = () => {
           </table>
         )}
       </div>
+
+      {/* ── View All button ── */}
+      <div className="rk-view-all-wrap">
+        <a href="/rankings" className="btn btn-dark rk-view-all-btn">
+          View All Rankings →
+        </a>
+      </div>
     </section>
   );
 };

@@ -40,9 +40,9 @@ const streamSources = [
 ];
 const LiveStream = () => {
   const videoRef = useRef(null);
-  const [active, setActive] = useState(streamSources[0]);
+  const [active, setActive] = useState(null);
   const [locked, setLocked] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     setLoading(true);
     if (!active) return;
@@ -80,7 +80,15 @@ const LiveStream = () => {
       </p>
       <div className="live-container">
         <div className={`player-wrapper ${wrapperModeClass}`}>
-          {active.type === "hls" ? (
+          {!active ? (
+            <div className="stream-placeholder">
+              <img src="/serverselect.png" alt="F1 Live Stream" />
+              {/* <div className="placeholder-overlay">
+                <h3>Formula 1 Live Stream</h3>
+                <p>Select a server below to start watching</p>
+              </div> */}
+            </div>
+          ) : active.type === "hls" ? (
             <video
               ref={videoRef}
               controls
@@ -112,7 +120,7 @@ const LiveStream = () => {
           {streamSources.map((s) => (
             <button
               key={s.id}
-              className={`server-btn ${active.id === s.id ? "active" : ""}`}
+              className={`server-btn ${active?.id === s.id ? "active" : ""}`}
               onClick={() => {
                 setLoading(true);
                 setActive(s);
@@ -123,7 +131,7 @@ const LiveStream = () => {
             </button>
           ))}
         </div>
-        {loading && <div className="stream-loading">⏳ Loading stream...</div>}
+        {/* {loading && <div className="stream-loading">⏳ Loading stream...</div>} */}
       </div>
     </section>
   );

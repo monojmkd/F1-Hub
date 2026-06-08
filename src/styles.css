@@ -641,6 +641,395 @@ h4 {
 }
 
 /* ============================================================
+   RANKINGS — "View All" button (append to existing .rk- block)
+   ============================================================ */
+.rk-view-all-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.rk-view-all-btn {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 11px 32px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-hi);
+  background: transparent;
+  color: var(--off-white);
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.1s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.rk-view-all-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   RANKINGS PAGE (RankingsPage.jsx)
+   ============================================================ */
+.rkp-page {
+  margin-top: 70px;
+  padding-bottom: 80px;
+  animation: fadeUp 0.4s ease both;
+}
+
+/* ── Header ── */
+.rkp-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.rkp-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rkp-title {
+  font-size: 22px !important;
+}
+
+/* ── Year select ── */
+.rkp-year-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-end;
+}
+.rkp-year-label {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+.rkp-year-select {
+  font-family: "Orbitron", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--white);
+  background: var(--dark3);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius);
+  padding: 8px 36px 8px 14px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+  min-width: 110px;
+}
+.rkp-year-select:hover,
+.rkp-year-select:focus {
+  border-color: var(--red);
+  background-color: var(--dark4);
+}
+.rkp-year-select option {
+  background: var(--dark3);
+  color: var(--white);
+}
+
+/* ── Tabs (reuse rk-tabs but with extra margin) ── */
+.rkp-tabs {
+  margin-bottom: 16px;
+}
+
+/* ── Panel ── */
+.rkp-panel {
+  min-height: 200px;
+}
+
+/* ── Loading / empty / error ── */
+.rkp-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 28px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--grey);
+  text-transform: uppercase;
+}
+.rkp-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-hi);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.rkp-empty {
+  padding: 48px 28px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--grey);
+}
+.rkp-error {
+  background: rgba(225, 6, 0, 0.1);
+  border: 1px solid rgba(225, 6, 0, 0.3);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 13px;
+  color: #ff6b6b;
+  margin-bottom: 16px;
+}
+
+/* ── Table ── */
+.rkp-table-wrap {
+  overflow-x: auto;
+}
+.rkp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.rkp-table thead th {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--grey);
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  background: var(--dark3);
+}
+.rkp-th-pos {
+  width: 56px;
+  text-align: center !important;
+}
+.rkp-th-nat {
+  width: 140px;
+}
+.rkp-th-num {
+  width: 72px;
+  text-align: right !important;
+}
+.rkp-th-bar {
+  width: 160px;
+  min-width: 100px;
+}
+
+.rkp-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+.rkp-table tbody tr:last-child {
+  border-bottom: none;
+}
+.rkp-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+.rkp-tr--top3 td:first-child {
+  position: relative;
+}
+
+.rkp-table td {
+  padding: 13px 16px;
+  vertical-align: middle;
+  color: var(--off-white);
+}
+
+/* ── Position cell ── */
+.rkp-pos {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Orbitron", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+.rkp-pos--1 {
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+}
+.rkp-pos--2 {
+  background: rgba(192, 192, 192, 0.15);
+  color: #c0c0c0;
+  font-size: 16px;
+}
+.rkp-pos--3 {
+  background: rgba(205, 127, 50, 0.15);
+  color: #cd7f32;
+  font-size: 16px;
+}
+.rkp-pos--rest {
+  color: var(--grey);
+  font-size: 13px;
+}
+
+/* ── Driver cell ── */
+.rkp-driver-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rkp-dot {
+  width: 3px;
+  height: 32px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.rkp-dot--lg {
+  height: 26px;
+}
+.rkp-driver-name {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: 0.02em;
+}
+.rkp-driver-code {
+  font-family: "Orbitron", sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--grey-dim);
+  margin-top: 2px;
+}
+
+/* ── Nationality ── */
+.rkp-nat {
+  font-size: 14px;
+  white-space: nowrap;
+  color: var(--grey);
+}
+.rkp-nat-text {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--grey);
+  margin-left: 4px;
+}
+
+/* ── Team pill ── */
+.rkp-team-pill {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 3px;
+  border-left: 3px solid var(--tc, #555);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--off-white);
+  white-space: nowrap;
+}
+
+/* ── Points / wins ── */
+.rkp-num {
+  font-family: "Orbitron", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+  color: var(--off-white);
+  white-space: nowrap;
+}
+.rkp-pts {
+  color: var(--white);
+  font-size: 14px;
+}
+
+/* ── Bar ── */
+.rkp-bar-cell {
+  padding-right: 20px !important;
+}
+.rkp-bar-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+  min-width: 80px;
+}
+.rkp-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* ── Footer note ── */
+.rkp-footer-note {
+  margin-top: 16px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--grey-dim);
+  text-align: right;
+  text-transform: uppercase;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .rkp-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .rkp-year-wrap {
+    align-items: flex-start;
+  }
+  .rkp-nat-text {
+    display: none;
+  }
+  .rkp-th-nat {
+    width: 40px;
+  }
+  .rkp-driver-code {
+    display: none;
+  }
+}
+@media (max-width: 540px) {
+  .rkp-table td,
+  .rkp-table th {
+    padding: 10px 10px;
+  }
+  .rkp-bar-cell {
+    display: none;
+  }
+  .rkp-th-bar {
+    display: none;
+  }
+}
+
+/* ============================================================
    STAT GRID  (RaceStats & AutoRaceStats)
    ============================================================ */
 .stat-grid {
@@ -1299,6 +1688,37 @@ h4 {
   color: var(--grey);
   text-transform: uppercase;
   padding: 6px 0;
+}
+
+.stream-placeholder {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.stream-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.placeholder-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  color: white;
+}
+
+.placeholder-overlay h3 {
+  font-size: 2rem;
+  margin-bottom: 10px;
 }
 
 /* ============================================================
