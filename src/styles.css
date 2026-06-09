@@ -4075,7 +4075,7 @@ footer .container > div p[style*="color: black"] {
 
 /* ── Card body (padding container) ────────────────────────── */
 .rwh-card-body {
-  padding: 12px 16px 18px;
+  padding: 12px 16px 8px;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -4369,4 +4369,75 @@ footer .container > div p[style*="color: black"] {
   letter-spacing: 0.06em;
   color: var(--white);
   /* margin-left: auto; */
+}
+
+.rwh-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 8px 0;
+}
+
+.rwh-tyre-title {
+  font-size: 0.8rem;
+  font-family: "Orbitron", sans-serif;
+  text-align: center;
+  font-weight: 700;
+  /* margin-bottom: 8px; */
+  color: #fff;
+}
+
+.rwh-tyre-display {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.strategy-tyre {
+  /* flex: 1; */
+  text-align: center;
+}
+
+.strategy-tyre img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(141, 141, 141, 0.35));
+}
+
+.strategy-tyre span {
+  font-family: "Orbitron", sans-serif;
+  display: block;
+  /* margin-top: 8px; */
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+.strategy-chain {
+  font-size: 0.8rem;
+  font-family: "Orbitron", sans-serif;
+  /* text-align: center; */
+  color: #ff1801;
+  font-weight: 700;
+}
+.rwh-strategy-fit {
+  margin-top: 8px;
+  gap: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tyre-type {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.tyre-code {
+  display: block;
+  /* margin-top: 2px; */
+  font-size: 0.75rem;
+  color: #aaa;
+  letter-spacing: 1px;
 }
