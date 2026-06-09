@@ -4441,3 +4441,10 @@ footer .container > div p[style*="color: black"] {
   color: #aaa;
   letter-spacing: 1px;
 }
+
+.rwh-strategy-wet-note {
+  font-size: 11px;
+  color: #60a5fa;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}

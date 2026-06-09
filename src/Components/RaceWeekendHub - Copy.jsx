@@ -27,7 +27,6 @@ const trackMapSlugs = {
   yas_marina: "yasmarina",
 };
 
-// ── Full 24-circuit data ──────────────────────────────────────
 const circuitInfo = {
   albert_park: {
     laps: 58,
@@ -223,6 +222,71 @@ const circuitInfo = {
   },
 };
 
+const tyreImages = {
+  hard: "https://tyre24.pirelli.com/motorsport/assets/motorsport/carousel/pirelli-motorsport-car-Formula1-SlickTyres-white-2026.png",
+  medium:
+    "https://tyre24.pirelli.com/motorsport/assets/motorsport/carousel/pirelli-motorsport-car-Formula1-SlickTyres-yellow-2026.png",
+  soft: "https://tyre24.pirelli.com/motorsport/assets/motorsport/carousel/pirelli-motorsport-car-Formula1-SlickTyres-red-2026.png",
+  intermediate:
+    "https://tyre24.pirelli.com/motorsport/assets/motorsport/banners/pirelli-motorsport-car-Formula1-WetTyres-green-senzaombra-2026.png",
+  fullWet:
+    "https://tyre24.pirelli.com/motorsport/assets/motorsport/banners/pirelli-motorsport-car-Formula1-WetTyres-blu-senzaombra-2026.png",
+};
+
+const tyreCompounds = {
+  albert_park: ["C3", "C4", "C5"],
+  bahrain: ["C1", "C2", "C3"],
+  jeddah: ["C2", "C3", "C4"],
+  shanghai: ["C2", "C3", "C4"],
+  miami: ["C2", "C3", "C4"],
+  imola: ["C3", "C4", "C5"],
+  monaco: ["C3", "C4", "C5"],
+  catalunya: ["C1", "C2", "C3"],
+  villeneuve: ["C3", "C4", "C5"],
+  red_bull_ring: ["C3", "C4", "C5"],
+  silverstone: ["C1", "C2", "C3"],
+  hungaroring: ["C3", "C4", "C5"],
+  spa: ["C2", "C3", "C4"],
+  zandvoort: ["C1", "C2", "C3"],
+  monza: ["C3", "C4", "C5"],
+  baku: ["C3", "C4", "C5"],
+  marina_bay: ["C3", "C4", "C5"],
+  americas: ["C2", "C3", "C4"],
+  hermanos_rodriguez: ["C2", "C3", "C4"],
+  interlagos: ["C2", "C3", "C4"],
+  vegas: ["C3", "C4", "C5"],
+  losail: ["C1", "C2", "C3"],
+  yas_marina: ["C3", "C4", "C5"],
+  suzuka: ["C1", "C2", "C3"],
+};
+
+const tyreStrategy = {
+  australian: ["C3", "C4", "C5"],
+  chinese: ["C2", "C3", "C4"],
+  japanese: ["C1", "C2", "C3"],
+  bahrain: ["C1", "C2", "C3"],
+  saudi_arabian: ["C3", "C4", "C5"],
+  miami: ["C3", "C4", "C5"],
+  emilia_romagna: ["C4", "C5", "C6"],
+  monaco: ["C4", "C5", "C6"],
+  spanish: ["C1", "C2", "C3"],
+  canadian: ["C4", "C5", "C6"],
+  austrian: ["C3", "C4", "C5"],
+  british: ["C2", "C3", "C4"],
+  belgian: ["C1", "C3", "C4"],
+  hungarian: ["C3", "C4", "C5"],
+  dutch: ["C2", "C3", "C4"],
+  italian: ["C3", "C4", "C5"],
+  azerbaijan: ["C4", "C5", "C6"],
+  singapore: ["C3", "C4", "C5"],
+  usa: ["C1", "C3", "C4"],
+  mexico: ["C2", "C4", "C5"],
+  brazil: ["C2", "C3", "C4"],
+  las_vegas: ["C3", "C4", "C5"],
+  qatar: ["C1", "C2", "C3"],
+  abu_dhabi: ["C3", "C4", "C5"],
+};
+
 const driverSlugOverrides = {
   antonelli: "kimi-antonelli",
   verstappen: "max-verstappen",
@@ -322,6 +386,12 @@ export default function RaceWeekendHub() {
       )
     : null;
 
+  const compounds = tyreCompounds[circuitId] || ["C2", "C3", "C4"];
+
+  const strategy = tyreStrategy[circuitId] || ["Medium", "Hard"];
+
+  const isWet = weather && weather.relative_humidity_2m > 80;
+
   return (
     <section className="rwh-section">
       <h2 className="section-title">Race Weekend Hub</h2>
@@ -380,7 +450,7 @@ export default function RaceWeekendHub() {
 
         {/* ── Weather Card ─────────────────────────────── */}
         <div className="rwh-card rwh-card--weather">
-          <div className="rwh-card-label">Track Weather</div>
+          <div className="rwh-card-label">Weather & Tyres</div>
           <div className="rwh-card-body">
             {weather ? (
               <>
@@ -415,14 +485,69 @@ export default function RaceWeekendHub() {
                       {weather.wind_speed_10m} km/h
                     </span>
                   </div>
-                  <div className="rwh-wx-row">
+                  {/* <div className="rwh-wx-row">
                     <span className="rwh-wx-icon">📍</span>
                     <span className="rwh-wx-label">Location</span>
                     <span className="rwh-wx-val">
                       {race.Circuit.Location.locality}
                     </span>
-                  </div>
+                  </div> */}
                 </div>
+
+                <div className="rwh-divider" />
+
+                <div className="rwh-tyre-title">Weekend Compounds</div>
+
+                <div className="rwh-tyre-display">
+                  {isWet ? (
+                    <>
+                      <div className="strategy-tyre">
+                        <img src={tyreImages.intermediate} alt="Intermediate" />
+                        <span className="tyre-type">Intermediate</span>
+                        <span className="tyre-code">Wet Track</span>
+                      </div>
+
+                      <div className="strategy-tyre">
+                        <img src={tyreImages.fullWet} alt="Wet" />
+                        <span className="tyre-type">Full Wet</span>
+                        <span className="tyre-code">Heavy Rain</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="strategy-tyre">
+                        <img src={tyreImages.hard} alt="Hard" />
+                        <span className="tyre-type">Hard</span>
+                        <span className="tyre-code">{compounds[0]}</span>
+                      </div>
+
+                      <div className="strategy-tyre">
+                        <img src={tyreImages.medium} alt="Medium" />
+                        <span className="tyre-type">Medium</span>
+                        <span className="tyre-code">{compounds[1]}</span>
+                      </div>
+
+                      <div className="strategy-tyre">
+                        <img src={tyreImages.soft} alt="Soft" />
+                        <span className="tyre-type">Soft</span>
+                        <span className="tyre-code">{compounds[2]}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {!isWet && (
+                  <>
+                    <div className="rwh-divider" />
+                    <div className="rwh-strategy-fit">
+                      <div className="rwh-tyre-title">Typical Strategy : </div>
+                      <div className="strategy-chain">
+                        {" "}
+                        {strategy.join(" ➜ ")}
+                      </div>
+                    </div>
+                  </>
+                )}
               </>
             ) : (
               <div className="rwh-loading">Loading weather…</div>

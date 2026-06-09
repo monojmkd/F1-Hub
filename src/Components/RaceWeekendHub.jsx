@@ -394,6 +394,7 @@ export default function RaceWeekendHub() {
   const strategy = tyreStrategy[circuitId] || ["Medium", "Hard"];
 
   const isWet = weather && weather.relative_humidity_2m > 80;
+  const isFullWet = weather && weather.relative_humidity_2m > 90;
 
   return (
     <section className="rwh-section">
@@ -499,7 +500,13 @@ export default function RaceWeekendHub() {
 
                 <div className="rwh-divider" />
 
-                <div className="rwh-tyre-title">Weekend Compounds</div>
+                <div className="rwh-tyre-title">
+                  {isWet
+                    ? isFullWet
+                      ? "Current Recommendation 🔵"
+                      : "Current Recommendation 🟢"
+                    : "Weekend Compounds"}
+                </div>
 
                 <div className="rwh-tyre-display">
                   {isWet ? (
@@ -511,7 +518,7 @@ export default function RaceWeekendHub() {
                       </div>
 
                       <div className="strategy-tyre">
-                        <img src={tyreImages.wet} alt="Wet" />
+                        <img src={tyreImages.fullWet} alt="Wet" />
                         <span className="tyre-type">Full Wet</span>
                         <span className="tyre-code">Heavy Rain</span>
                       </div>
@@ -539,18 +546,18 @@ export default function RaceWeekendHub() {
                   )}
                 </div>
 
-                {!isWet && (
-                  <>
-                    <div className="rwh-divider" />
-                    <div className="rwh-strategy-fit">
-                      <div className="rwh-tyre-title">Typical Strategy : </div>
-                      <div className="strategy-chain">
-                        {" "}
-                        {strategy.join(" ➜ ")}
+                <>
+                  <div className="rwh-divider" />
+                  <div className="rwh-strategy-fit">
+                    <div className="rwh-tyre-title">Typical Dry Strategy</div>
+                    <div className="strategy-chain">{strategy.join(" ➤ ")}</div>
+                    {isWet && (
+                      <div className="rwh-strategy-wet-note">
+                        ⚠️ Wet conditions — expect changes
                       </div>
-                    </div>
-                  </>
-                )}
+                    )}
+                  </div>
+                </>
               </>
             ) : (
               <div className="rwh-loading">Loading weather…</div>
