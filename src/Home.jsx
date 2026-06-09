@@ -366,7 +366,7 @@ export default function Home() {
         <LiveTrackMap />
       </section> */}
 
-      <section className="home-section container">
+      <section id="rankings-page" className="home-section container">
         <RaceWeekendHub />
       </section>
 

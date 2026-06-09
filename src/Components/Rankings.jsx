@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const SEASON = 2026;
 const CACHE_KEY = `f1_standings_${SEASON}`;
@@ -335,9 +336,9 @@ const Rankings = () => {
 
       {/* ── View All button ── */}
       <div className="rk-view-all-wrap">
-        <a href="/rankings" className="btn btn-dark rk-view-all-btn">
+        <Link to="/rankings" className="btn btn-dark rk-view-all-btn">
           View All Rankings →
-        </a>
+        </Link>
       </div>
     </section>
   );
