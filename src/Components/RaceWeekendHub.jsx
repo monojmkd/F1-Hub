@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 
+// ── Track image slugs (F1 CDN) ────────────────────────────────
 const trackMapSlugs = {
   albert_park: "albertpark",
   shanghai: "shanghai",
@@ -27,6 +28,7 @@ const trackMapSlugs = {
   yas_marina: "yasmarina",
 };
 
+// ── Circuit data ──────────────────────────────────────────────
 const circuitInfo = {
   albert_park: {
     laps: 58,
@@ -60,6 +62,14 @@ const circuitInfo = {
     fastestLap: "1:32.238",
     fastestLapDriver: "Michael Schumacher",
   },
+  suzuka: {
+    laps: 53,
+    turns: 18,
+    length: "5.807 km",
+    distance: "307.471 km",
+    fastestLap: "1:30.965",
+    fastestLapDriver: "Kimi Antonelli",
+  },
   miami: {
     laps: 57,
     turns: 19,
@@ -84,14 +94,6 @@ const circuitInfo = {
     fastestLap: "1:12.909",
     fastestLapDriver: "Lewis Hamilton",
   },
-  catalunya: {
-    laps: 66,
-    turns: 14,
-    length: "4.657 km",
-    distance: "307.236 km",
-    fastestLap: "1:16.330",
-    fastestLapDriver: "Oscar Piastri",
-  },
   villeneuve: {
     laps: 70,
     turns: 14,
@@ -99,6 +101,14 @@ const circuitInfo = {
     distance: "305.270 km",
     fastestLap: "1:13.078",
     fastestLapDriver: "Valtteri Bottas",
+  },
+  catalunya: {
+    laps: 66,
+    turns: 14,
+    length: "4.657 km",
+    distance: "307.236 km",
+    fastestLap: "1:16.330",
+    fastestLapDriver: "Oscar Piastri",
   },
   red_bull_ring: {
     laps: 71,
@@ -212,82 +222,184 @@ const circuitInfo = {
     fastestLap: "1:26.103",
     fastestLapDriver: "Max Verstappen",
   },
+};
+
+// ── Tyre data: compounds + typical 1-stop strategy
+// ALL keyed by circuitId (matches Jolpica/Ergast) ─────────────
+const tyreData = {
+  albert_park: {
+    compounds: ["C3", "C4", "C5"],
+    strategy: ["Soft", "Medium", "Hard"],
+    stops: 1,
+    note: "1-stop typical",
+  },
+  bahrain: {
+    compounds: ["C1", "C2", "C3"],
+    strategy: ["Medium", "Hard"],
+    stops: 1,
+    note: "Hard tyres dominate",
+  },
+  jeddah: {
+    compounds: ["C2", "C3", "C4"],
+    strategy: ["Soft", "Medium"],
+    stops: 1,
+    note: "Softs for qualifying pace",
+  },
+  shanghai: {
+    compounds: ["C2", "C3", "C4"],
+    strategy: ["Medium", "Hard"],
+    stops: 1,
+    note: "High deg on rear",
+  },
   suzuka: {
-    laps: 53,
-    turns: 18,
-    length: "5.807 km",
-    distance: "307.471 km",
-    fastestLap: "1:30.965",
-    fastestLapDriver: "Kimi Antonelli",
+    compounds: ["C1", "C2", "C3"],
+    strategy: ["Medium", "Hard"],
+    stops: 1,
+    note: "Hard stint opens strategy",
+  },
+  miami: {
+    compounds: ["C2", "C3", "C4"],
+    strategy: ["Soft", "Medium"],
+    stops: 1,
+    note: "Abrasive surface, 1-stop",
+  },
+  imola: {
+    compounds: ["C3", "C4", "C5"],
+    strategy: ["Soft", "Hard"],
+    stops: 1,
+    note: "Limited overtaking, undercut key",
+  },
+  monaco: {
+    compounds: ["C3", "C4", "C5"],
+    strategy: ["Soft", "Medium"],
+    stops: 1,
+    note: "Track position everything",
+  },
+  villeneuve: {
+    compounds: ["C3", "C4", "C5"],
+    strategy: ["Soft", "Hard"],
+    stops: 1,
+    note: "Safety car likely",
+  },
+  catalunya: {
+    compounds: ["C1", "C2", "C3"],
+    strategy: ["Medium", "Hard"],
+    stops: 1,
+    note: "High deg, 1-stop marginal",
+  },
+  red_bull_ring: {
+    compounds: ["C3", "C4", "C5"],
+    strategy: ["Soft", "Hard"],
+    stops: 1,
+    note: "Short lap = undercut power",
+  },
+  silverstone: {
+    compounds: ["C1", "C2", "C3"],
+    strategy: ["Medium", "Hard"],
+    stops: 1,
+    note: "High-speed deg on shoulders",
+  },
+  hungaroring: {
+    compounds: ["C3", "C4", "C5"],
+    strategy: ["Soft", "Medium"],
+    stops: 2,
+    note: "2-stop faster but risky",
+  },
+  spa: {
+    compounds: ["C2", "C3", "C4"],
+    strategy: ["Medium", "Hard"],
+    stops: 1,
+    note: "Low deg, 1-stop comfortable",
+  },
+  zandvoort: {
+    compounds: ["C1", "C2", "C3"],
+    strategy: ["Medium", "Hard"],
+    stops: 1,
+    note: "VSC/SC can shuffle strategy",
+  },
+  monza: {
+    compounds: ["C3", "C4", "C5"],
+    strategy: ["Soft", "Medium"],
+    stops: 1,
+    note: "Lowest downforce circuit",
+  },
+  baku: {
+    compounds: ["C3", "C4", "C5"],
+    strategy: ["Soft", "Hard"],
+    stops: 1,
+    note: "SC likely, hard stint crucial",
+  },
+  marina_bay: {
+    compounds: ["C3", "C4", "C5"],
+    strategy: ["Soft", "Medium"],
+    stops: 1,
+    note: "SC almost certain",
+  },
+  americas: {
+    compounds: ["C2", "C3", "C4"],
+    strategy: ["Medium", "Hard"],
+    stops: 1,
+    note: "Bumpy surface hurts tyres",
+  },
+  hermanos_rodriguez: {
+    compounds: ["C2", "C3", "C4"],
+    strategy: ["Soft", "Medium"],
+    stops: 1,
+    note: "Altitude reduces deg",
+  },
+  interlagos: {
+    compounds: ["C2", "C3", "C4"],
+    strategy: ["Medium", "Hard"],
+    stops: 1,
+    note: "Weather often disrupts",
+  },
+  vegas: {
+    compounds: ["C3", "C4", "C5"],
+    strategy: ["Soft", "Hard"],
+    stops: 1,
+    note: "Cold track = slow warm-up",
+  },
+  losail: {
+    compounds: ["C1", "C2", "C3"],
+    strategy: ["Medium", "Hard"],
+    stops: 1,
+    note: "High deg on rears",
+  },
+  yas_marina: {
+    compounds: ["C3", "C4", "C5"],
+    strategy: ["Soft", "Medium"],
+    stops: 1,
+    note: "Final race, aggressive calls",
   },
 };
 
+// ── Pirelli tyre images ───────────────────────────────────────
 const tyreImages = {
-  hard: "https://www.pirelli.com/tyres/car/next/motorsport/assets/images?url=https%3A%2F%2Ftyre24.pirelli.com%2Fmotorsport%2Fassets%2Fmotorsport%2Fcarousel%2Fpirelli-motorsport-car-Formula1-SlickTyres-white-2026.png&w=1920&q=75",
-
+  hard: "https://tyre24.pirelli.com/motorsport/assets/motorsport/carousel/pirelli-motorsport-car-Formula1-SlickTyres-white-2026.png",
   medium:
-    "https://www.pirelli.com/tyres/car/next/motorsport/assets/images?url=https%3A%2F%2Ftyre24.pirelli.com%2Fmotorsport%2Fassets%2Fmotorsport%2Fcarousel%2Fpirelli-motorsport-car-Formula1-SlickTyres-yellow-2026.png&w=1920&q=75",
-
-  soft: "https://www.pirelli.com/tyres/car/next/motorsport/assets/images?url=https%3A%2F%2Ftyre24.pirelli.com%2Fmotorsport%2Fassets%2Fmotorsport%2Fcarousel%2Fpirelli-motorsport-car-Formula1-SlickTyres-red-2026.png&w=1920&q=75",
-
+    "https://tyre24.pirelli.com/motorsport/assets/motorsport/carousel/pirelli-motorsport-car-Formula1-SlickTyres-yellow-2026.png",
+  soft: "https://tyre24.pirelli.com/motorsport/assets/motorsport/carousel/pirelli-motorsport-car-Formula1-SlickTyres-red-2026.png",
   intermediate:
     "https://tyre24.pirelli.com/motorsport/assets/motorsport/banners/pirelli-motorsport-car-Formula1-WetTyres-green-senzaombra-2026.png",
   fullWet:
     "https://tyre24.pirelli.com/motorsport/assets/motorsport/banners/pirelli-motorsport-car-Formula1-WetTyres-blu-senzaombra-2026.png",
 };
 
-const tyreCompounds = {
-  albert_park: ["C3", "C4", "C5"],
-  bahrain: ["C1", "C2", "C3"],
-  jeddah: ["C2", "C3", "C4"],
-  shanghai: ["C2", "C3", "C4"],
-  miami: ["C2", "C3", "C4"],
-  imola: ["C3", "C4", "C5"],
-  monaco: ["C3", "C4", "C5"],
-  catalunya: ["C1", "C2", "C3"],
-  villeneuve: ["C3", "C4", "C5"],
-  red_bull_ring: ["C3", "C4", "C5"],
-  silverstone: ["C1", "C2", "C3"],
-  hungaroring: ["C3", "C4", "C5"],
-  spa: ["C2", "C3", "C4"],
-  zandvoort: ["C1", "C2", "C3"],
-  monza: ["C3", "C4", "C5"],
-  baku: ["C3", "C4", "C5"],
-  marina_bay: ["C3", "C4", "C5"],
-  americas: ["C2", "C3", "C4"],
-  hermanos_rodriguez: ["C2", "C3", "C4"],
-  interlagos: ["C2", "C3", "C4"],
-  vegas: ["C3", "C4", "C5"],
-  losail: ["C1", "C2", "C3"],
-  yas_marina: ["C3", "C4", "C5"],
-  suzuka: ["C1", "C2", "C3"],
+const COMPOUND_COLOR = {
+  C1: "#fff",
+  C2: "#fff",
+  C3: "#FFC906",
+  C4: "#FFC906",
+  C5: "#E8002D",
+  C6: "#E8002D",
 };
-
-const tyreStrategy = {
-  australian: ["C3", "C4", "C5"],
-  chinese: ["C2", "C3", "C4"],
-  japanese: ["C1", "C2", "C3"],
-  bahrain: ["C1", "C2", "C3"],
-  saudi_arabian: ["C3", "C4", "C5"],
-  miami: ["C3", "C4", "C5"],
-  emilia_romagna: ["C4", "C5", "C6"],
-  monaco: ["C4", "C5", "C6"],
-  spanish: ["C1", "C2", "C3"],
-  canadian: ["C4", "C5", "C6"],
-  austrian: ["C3", "C4", "C5"],
-  british: ["C2", "C3", "C4"],
-  belgian: ["C1", "C3", "C4"],
-  hungarian: ["C3", "C4", "C5"],
-  dutch: ["C2", "C3", "C4"],
-  italian: ["C3", "C4", "C5"],
-  azerbaijan: ["C4", "C5", "C6"],
-  singapore: ["C3", "C4", "C5"],
-  usa: ["C1", "C3", "C4"],
-  mexico: ["C2", "C4", "C5"],
-  brazil: ["C2", "C3", "C4"],
-  las_vegas: ["C3", "C4", "C5"],
-  qatar: ["C1", "C2", "C3"],
-  abu_dhabi: ["C3", "C4", "C5"],
+const COMPOUND_BG = {
+  C1: "rgba(255,255,255,0.08)",
+  C2: "rgba(255,255,255,0.08)",
+  C3: "rgba(255,201,6,0.12)",
+  C4: "rgba(255,201,6,0.12)",
+  C5: "rgba(232,0,45,0.12)",
+  C6: "rgba(232,0,45,0.12)",
 };
 
 const driverSlugOverrides = {
@@ -308,10 +420,10 @@ function getDriverImage(givenName, familyName) {
   return `https://www.kymillman.com/wp-content/uploads/f1/pages/driver-profiles/driver-faces/${slug}-f1-driver-profile-picture.png`;
 }
 
-// ── Dynamic weather condition ─────────────────────────────────
-function getWeatherCondition(temp, humidity, windSpeed) {
+// ── Weather condition ─────────────────────────────────────────
+function getCondition(temp, humidity, wind) {
   if (humidity > 80) return { label: "🌧 Wet Conditions", cls: "wet" };
-  if (windSpeed > 40) return { label: "💨 High Winds", cls: "windy" };
+  if (wind > 40) return { label: "💨 High Winds", cls: "windy" };
   if (temp > 35) return { label: "🔥 Extreme Heat", cls: "hot" };
   if (temp > 28) return { label: "☀ Ideal Racing", cls: "ideal" };
   if (temp < 15) return { label: "🌡 Cold Track", cls: "cold" };
@@ -341,35 +453,58 @@ export default function RaceWeekendHub() {
       if (!next) return;
       setRace(next);
       loadWeather(next.Circuit.Location.lat, next.Circuit.Location.long);
-    } catch (err) {
-      console.error(err);
+    } catch (e) {
+      console.error(e);
     }
   }
 
   async function loadWeather(lat, lon) {
     try {
       const res = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`,
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+          `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation`,
       );
       const data = await res.json();
       setWeather(data.current);
-    } catch (err) {
-      console.error(err);
+    } catch (e) {
+      console.error(e);
     }
   }
 
   async function loadStandings() {
     try {
-      const res = await fetch(
-        "https://api.jolpi.ca/ergast/f1/current/driverStandings.json",
-      );
+      // Use /api/standings (Vercel function) — fast, cached, no CORS
+      const res = await fetch("/api/standings");
       const data = await res.json();
-      const s =
-        data?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings ||
-        [];
-      setTopDrivers(s.slice(0, 7));
-    } catch (err) {
-      console.error(err);
+      if (data.drivers?.length) {
+        // Remap to match shape expected below
+        setTopDrivers(
+          data.drivers.slice(0, 7).map((d) => ({
+            position: String(d.position),
+            points: d.points,
+            Driver: {
+              givenName: d.givenName,
+              familyName: d.familyName,
+              code: d.code,
+            },
+            Constructors: [{ name: d.team }],
+          })),
+        );
+      }
+    } catch {
+      // Fallback to Jolpica if /api/standings unavailable
+      try {
+        const res = await fetch(
+          "https://api.jolpi.ca/ergast/f1/current/driverStandings.json",
+        );
+        const data = await res.json();
+        const s =
+          data?.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings ||
+          [];
+        setTopDrivers(s.slice(0, 7));
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
@@ -379,22 +514,39 @@ export default function RaceWeekendHub() {
   const slug = trackMapSlugs[circuitId] || circuitId.replace(/_/g, "");
   const trackImage = `https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026track${slug}detailed.webp`;
   const info = circuitInfo[circuitId] || {};
+  const tyre = tyreData[circuitId] || {
+    compounds: ["C2", "C3", "C4"],
+    strategy: ["Medium", "Hard"],
+    stops: 1,
+    note: "1-stop typical",
+  };
   const leader = topDrivers[0];
 
+  const isWet =
+    weather &&
+    (weather.relative_humidity_2m > 80 || (weather.precipitation ?? 0) > 0);
+  const isFullWet = weather && weather.relative_humidity_2m > 92;
   const condition = weather
-    ? getWeatherCondition(
+    ? getCondition(
         weather.temperature_2m,
         weather.relative_humidity_2m,
         weather.wind_speed_10m,
       )
     : null;
 
-  const compounds = tyreCompounds[circuitId] || ["C2", "C3", "C4"];
+  // Compound pills for the 3 dry compounds
+  const compoundPills = tyre.compounds.map((c, i) => {
+    const names = ["Hard", "Medium", "Soft"];
+    return {
+      code: c,
+      name: names[i] || c,
+      color: COMPOUND_COLOR[c] || "#888",
+      bg: COMPOUND_BG[c] || "rgba(255,255,255,0.06)",
+    };
+  });
 
-  const strategy = tyreStrategy[circuitId] || ["Medium", "Hard"];
-
-  const isWet = weather && weather.relative_humidity_2m > 80;
-  const isFullWet = weather && weather.relative_humidity_2m > 90;
+  // Strategy arrow chain e.g. "Soft → Hard" or "Medium → Hard"
+  const strategyChain = tyre.strategy.join(" → ");
 
   return (
     <section className="rwh-section">
@@ -402,7 +554,7 @@ export default function RaceWeekendHub() {
       <p className="subtle">Next race · {race.raceName}</p>
 
       <div className="rwh-grid">
-        {/* ── Circuit Card ─────────────────────────────── */}
+        {/* ── Circuit Card ─────────────────────────── */}
         <div className="rwh-card rwh-card--circuit">
           <div className="rwh-card-label">Circuit</div>
           <div className="rwh-track-img-wrap">
@@ -411,7 +563,7 @@ export default function RaceWeekendHub() {
               alt={race.Circuit.circuitName}
               className="rwh-track-img"
               onError={(e) => {
-                e.currentTarget.style.opacity = "0.2";
+                e.currentTarget.style.opacity = "0.15";
               }}
             />
           </div>
@@ -435,14 +587,14 @@ export default function RaceWeekendHub() {
               </div>
               <div className="rwh-stat">
                 <span className="rwh-stat-val">{info.distance || "—"}</span>
-                <span className="rwh-stat-key">Distance</span>
+                <span className="rwh-stat-key">Race Dist.</span>
               </div>
               <div className="rwh-stat rwh-stat--wide">
                 <span className="rwh-stat-val rwh-stat-val--mono">
                   {info.fastestLap || "—"}
                 </span>
                 {info.fastestLapDriver && (
-                  <span className="lap-record-driver">
+                  <span className="rwh-lap-driver">
                     {info.fastestLapDriver}
                   </span>
                 )}
@@ -452,112 +604,116 @@ export default function RaceWeekendHub() {
           </div>
         </div>
 
-        {/* ── Weather Card ─────────────────────────────── */}
+        {/* ── Weather & Tyres Card ─────────────────── */}
         <div className="rwh-card rwh-card--weather">
           <div className="rwh-card-label">Weather & Tyres</div>
           <div className="rwh-card-body">
             {weather ? (
               <>
+                {/* Weather section */}
                 <div
                   className={`rwh-condition rwh-condition--${condition.cls}`}
                 >
                   {condition.label}
                 </div>
-                <div className="rwh-temp-big">
-                  {Math.round(weather.temperature_2m)}
-                  <span className="rwh-temp-unit">°C</span>
-                </div>
-                <div className="rwh-weather-rows">
-                  <div className="rwh-wx-row">
-                    <span className="rwh-wx-icon">🌡</span>
-                    <span className="rwh-wx-label">Air Temp</span>
-                    <span className="rwh-wx-val">
-                      {Math.round(weather.temperature_2m)}°C
-                    </span>
+                <div className="rwh-weather">
+                  <div className="rwh-temp-big">
+                    {Math.round(weather.temperature_2m)}
+                    <span className="rwh-temp-unit">°C</span>
                   </div>
-                  <div className="rwh-wx-row">
-                    <span className="rwh-wx-icon">💧</span>
-                    <span className="rwh-wx-label">Humidity</span>
-                    <span className="rwh-wx-val">
-                      {weather.relative_humidity_2m}%
-                    </span>
+                  <div className="rwh-weather-rows">
+                    <div className="rwh-wx-row">
+                      <span className="rwh-wx-icon">🌡</span>
+                      <span className="rwh-wx-label">Air Temp</span>
+                      <span className="rwh-wx-val">
+                        {Math.round(weather.temperature_2m)}°C
+                      </span>
+                    </div>
+                    <div className="rwh-wx-row">
+                      <span className="rwh-wx-icon">💧</span>
+                      <span className="rwh-wx-label">Humidity</span>
+                      <span className="rwh-wx-val">
+                        {weather.relative_humidity_2m}%
+                      </span>
+                    </div>
+                    <div className="rwh-wx-row">
+                      <span className="rwh-wx-icon">💨</span>
+                      <span className="rwh-wx-label">Wind</span>
+                      <span className="rwh-wx-val">
+                        {weather.wind_speed_10m} km/h
+                      </span>
+                    </div>
                   </div>
-                  <div className="rwh-wx-row">
-                    <span className="rwh-wx-icon">💨</span>
-                    <span className="rwh-wx-label">Wind Speed</span>
-                    <span className="rwh-wx-val">
-                      {weather.wind_speed_10m} km/h
-                    </span>
-                  </div>
-                  {/* <div className="rwh-wx-row">
-                    <span className="rwh-wx-icon">📍</span>
-                    <span className="rwh-wx-label">Location</span>
-                    <span className="rwh-wx-val">
-                      {race.Circuit.Location.locality}
-                    </span>
-                  </div> */}
                 </div>
 
                 <div className="rwh-divider" />
 
+                {/* Tyre section */}
+                {isWet ? (
+                  <>
+                    <div className="rwh-tyre-title">
+                      {isFullWet
+                        ? "🔵 Full Wet Recommended"
+                        : "🟢 Intermediates Recommended"}
+                    </div>
+                    <div className="rwh-tyre-display">
+                      <div className="rwh-tyre-item">
+                        <img
+                          src={tyreImages.intermediate}
+                          alt="Intermediate"
+                          className="rwh-tyre-img"
+                        />
+                        <span className="rwh-tyre-name">Inter</span>
+                        <span className="rwh-tyre-sub">Damp track</span>
+                      </div>
+                      <div className="rwh-tyre-item">
+                        <img
+                          src={tyreImages.fullWet}
+                          alt="Full Wet"
+                          className="rwh-tyre-img"
+                        />
+                        <span className="rwh-tyre-name">Full Wet</span>
+                        <span className="rwh-tyre-sub">Heavy rain</span>
+                      </div>
+                    </div>
+                    <div className="rwh-strategy-note">
+                      ⚠ Dry strategy below — expect changes
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="rwh-tyre-title">Weekend Compounds</div>
+                    <div className="rwh-tyre-display">
+                      {compoundPills.map(({ code, name, color, bg }) => (
+                        <div key={code} className="rwh-tyre-item">
+                          <img
+                            src={tyreImages[name.toLowerCase()]}
+                            alt={name}
+                            className="rwh-tyre-img"
+                          />
+                          <span className="rwh-tyre-name" style={{ color }}>
+                            {name}
+                          </span>
+                          <span
+                            className="rwh-compound-pill"
+                            style={{ color, background: bg }}
+                          >
+                            {code}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                <div className="rwh-divider" />
+
+                {/* Strategy */}
                 <div className="rwh-tyre-title">
-                  {isWet
-                    ? isFullWet
-                      ? "Current Recommendation 🔵"
-                      : "Current Recommendation 🟢"
-                    : "Weekend Compounds"}
+                  Typical {tyre.stops}-Stop Strategy
                 </div>
-
-                <div className="rwh-tyre-display">
-                  {isWet ? (
-                    <>
-                      <div className="strategy-tyre">
-                        <img src={tyreImages.intermediate} alt="Intermediate" />
-                        <span className="tyre-type">Intermediate</span>
-                        <span className="tyre-code">Wet Track</span>
-                      </div>
-
-                      <div className="strategy-tyre">
-                        <img src={tyreImages.fullWet} alt="Wet" />
-                        <span className="tyre-type">Full Wet</span>
-                        <span className="tyre-code">Heavy Rain</span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="strategy-tyre">
-                        <img src={tyreImages.hard} alt="Hard" />
-                        <span className="tyre-type">Hard</span>
-                        <span className="tyre-code">{compounds[0]}</span>
-                      </div>
-
-                      <div className="strategy-tyre">
-                        <img src={tyreImages.medium} alt="Medium" />
-                        <span className="tyre-type">Medium</span>
-                        <span className="tyre-code">{compounds[1]}</span>
-                      </div>
-
-                      <div className="strategy-tyre">
-                        <img src={tyreImages.soft} alt="Soft" />
-                        <span className="tyre-type">Soft</span>
-                        <span className="tyre-code">{compounds[2]}</span>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                <>
-                  <div className="rwh-divider" />
-                  <div className="rwh-strategy-fit">
-                    <div className="rwh-tyre-title">Typical Dry Strategy</div>
-                    <div className="strategy-chain">{strategy.join(" ➤ ")}</div>
-                    {isWet && (
-                      <div className="rwh-strategy-wet-note">
-                        ⚠️ Wet conditions — expect changes
-                      </div>
-                    )}
-                  </div>
-                </>
+                <div className="rwh-strategy-chain">{strategyChain}</div>
+                <div className="rwh-strategy-note">{tyre.note}</div>
               </>
             ) : (
               <div className="rwh-loading">Loading weather…</div>
@@ -565,7 +721,7 @@ export default function RaceWeekendHub() {
           </div>
         </div>
 
-        {/* ── Championship Card ─────────────────────────── */}
+        {/* ── Championship Card ─────────────────────── */}
         <div className="rwh-card rwh-card--champ">
           <div className="rwh-card-label">Championship Battle</div>
           <div className="rwh-card-body">
@@ -596,7 +752,6 @@ export default function RaceWeekendHub() {
                   {leader.points}
                   <span className="rwh-pts-label"> PTS</span>
                 </div>
-
                 <div className="rwh-battle-list">
                   {topDrivers.map((d) => {
                     const gap = Number(leader.points) - Number(d.points);
@@ -621,7 +776,6 @@ export default function RaceWeekendHub() {
                     );
                   })}
                 </div>
-
                 <div className="rwh-round-badge">
                   Round {race.round} · {race.Circuit.Location.country}
                 </div>

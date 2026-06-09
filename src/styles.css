@@ -4165,6 +4165,12 @@ footer .container > div p[style*="color: black"] {
 }
 
 /* ── WEATHER CARD ──────────────────────────────────────────── */
+.rwh-weather {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
 .rwh-condition {
   display: inline-block;
   font-family: "Barlow Condensed", sans-serif;
@@ -4215,6 +4221,8 @@ footer .container > div p[style*="color: black"] {
 }
 
 .rwh-weather-rows {
+  flex: 1;
+  min-width: 220px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -4447,4 +4455,63 @@ footer .container > div p[style*="color: black"] {
   color: #60a5fa;
   letter-spacing: 0.06em;
   margin-top: 4px;
+}
+
+/* ── RaceWeekendHub tyre + strategy additions ────────────────── */
+.rwh-tyre-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+.rwh-tyre-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(140, 140, 140, 0.3));
+}
+.rwh-tyre-name {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.rwh-tyre-sub {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.7rem;
+  color: var(--grey);
+  letter-spacing: 0.06em;
+}
+.rwh-compound-pill {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.08em;
+}
+.rwh-strategy-chain {
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--red);
+  text-align: center;
+  letter-spacing: 0.06em;
+  padding: 4px 0;
+}
+.rwh-strategy-note {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  color: var(--grey);
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+.rwh-lap-driver {
+  display: block;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 11px;
+  color: var(--grey);
+  letter-spacing: 0.04em;
+  margin-top: 2px;
 }
