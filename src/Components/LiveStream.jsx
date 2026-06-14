@@ -35,7 +35,7 @@ const streamSources = [
     id: 6,
     name: "Server 6 (Sky Sports 2)",
     type: "iframe",
-    url: "https://junkieembeds.pages.dev/embed/f1-fuck-you-sky",
+    url: "https://junkieembeds.pages.dev/embed/sky-sports-f1",
   },
 ];
 const LiveStream = () => {
