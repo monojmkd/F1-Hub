@@ -23,19 +23,19 @@ const streamSources = [
     id: 4,
     name: "Server 4",
     type: "iframe",
-    url: "https://streamfree.app/embed/racing/skyf1?server=origin&quality=1080p&category=racing",
+    url: "https://sportspass.cfd/f1/f1streams.html",
   },
   {
     id: 5,
     name: "Server 5 (AppleTV)",
     type: "iframe",
-    url: "https://junkieembeds.pages.dev/embed/f1-on-apple",
+    url: "https://a6.kora-plus.app/frame.php?ch=f1&p=12&token=9a4a92f2-30f5-4b95-8621-817e4b8713b8&kt=1782651635",
   },
   {
     id: 6,
     name: "Server 6 (Sky Sports 2)",
     type: "iframe",
-    url: "https://junkieembeds.pages.dev/embed/sky-sports-f1",
+    url: "https://cdnlivetv.tv/api/v1/channels/player/?name=Sky%20Sports%20F1%20HD%20DE&code=&user=cdnlivetv&plan=free",
   },
 ];
 const LiveStream = () => {
