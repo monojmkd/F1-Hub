@@ -16,29 +16,29 @@ const streamSources = [
   },
   {
     id: 3,
-    name: "Server 3 (StreamEast)",
-    type: "iframe",
-    // ⚠ t= timestamp expires — get fresh URL on race day from streameast
-    url: "https://auth.streamea.st/sso-frame.php?domain=v2.streameast.ga&redirect=/f1/heineken-dutch-grand-prix-f1-race-401839097/&t=1787494297571",
+    name: "Server 3 (HLS)",
+    type: "hls",
+    // ⚠ Token-based — may expire. Refresh URL on race day.
+    url: "https://lb7.strmd.st/secure/QfWkEsWMvvoPfArcksoIqheOmUeUEjmU/rtmp/stream/nwXumQye0RfVvM41xUgh2VeUAdQOIMLT23VTfqSUIeC1OA4CfPVdhz251_VIo09ffhFgHW_OtNKDLa8t60HMA2hVyIiTTz-cgYB9ODQ/1/playlist.m3u8",
   },
   {
     id: 4,
-    name: "Server 4",
-    type: "iframe",
-    url: "https://streame.center/embed/ch49.php",
+    name: "Server 4 (HLS)",
+    type: "hls",
+    // ⚠ Token-based — may expire. Refresh URL on race day.
+    url: "https://lb4.strmd.st/secure/bYFYLLiNMXBxuhvmalYCbQAkOxBUAywN/rtmp/stream/rQvigtNC4ajn5ETJ7hFLZCU0ccGYRPfggtq7Lla8gDY7z4wQXBUylGc9QYJWdhsmS-pEkSD5Mp8/1/playlist.m3u8",
   },
   {
     id: 5,
-    name: "Server 5",
+    name: "Server 5 (Sky F1)",
     type: "iframe",
-    // ⚠ May require VPN
-    url: "https://hamis.romponalis.st/premiumtv/daddy3.php?id=115",
+    url: "https://junkieembeds.pages.dev/embed/f1-fuck-you-sky",
   },
   {
     id: 6,
-    name: "Server 6 (Sky Sports 2)",
+    name: "Server 6 ⚠ VPN",
     type: "iframe",
-    url: "https://cdnlivetv.tv/api/v1/channels/player/?name=Sky%20Sports%20F1%20HD%20DE&code=&user=cdnlivetv&plan=free",
+    url: "https://hamis.romponalis.st/premiumtv/daddy3.php?id=111",
   },
 ];
 
@@ -50,7 +50,6 @@ const LiveStream = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Destroy previous HLS instance on server switch
     if (hlsRef.current) {
       hlsRef.current.destroy();
       hlsRef.current = null;
