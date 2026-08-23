@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
+
 const streamSources = [
   {
     id: 1,
@@ -15,21 +16,23 @@ const streamSources = [
   },
   {
     id: 3,
-    name: "Server 3",
+    name: "Server 3 (StreamEast)",
     type: "iframe",
-    url: "https://sportspass.fit/f1/f1streams.html",
+    // ⚠ t= timestamp expires — get fresh URL on race day from streameast
+    url: "https://auth.streamea.st/sso-frame.php?domain=v2.streameast.ga&redirect=/f1/heineken-dutch-grand-prix-f1-race-401839097/&t=1787494297571",
   },
   {
     id: 4,
     name: "Server 4",
     type: "iframe",
-    url: "https://sportspass.cfd/f1/f1streams.html",
+    url: "https://streame.center/embed/ch49.php",
   },
   {
     id: 5,
-    name: "Server 5 (AppleTV)",
+    name: "Server 5",
     type: "iframe",
-    url: "https://a6.kora-plus.app/frame.php?ch=f1&p=12&token=9a4a92f2-30f5-4b95-8621-817e4b8713b8&kt=1782651635",
+    // ⚠ May require VPN
+    url: "https://hamis.romponalis.st/premiumtv/daddy3.php?id=115",
   },
   {
     id: 6,
@@ -38,25 +41,43 @@ const streamSources = [
     url: "https://cdnlivetv.tv/api/v1/channels/player/?name=Sky%20Sports%20F1%20HD%20DE&code=&user=cdnlivetv&plan=free",
   },
 ];
+
 const LiveStream = () => {
   const videoRef = useRef(null);
+  const hlsRef = useRef(null);
   const [active, setActive] = useState(null);
   const [locked, setLocked] = useState(true);
   const [loading, setLoading] = useState(false);
+
   useEffect(() => {
+    // Destroy previous HLS instance on server switch
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+
     setLoading(true);
-    if (!active) return;
+    if (!active) {
+      setLoading(false);
+      return;
+    }
+
     if (active.type === "hls" && videoRef.current) {
       if (Hls.isSupported()) {
         const hls = new Hls();
+        hlsRef.current = hls;
         hls.loadSource(active.url);
         hls.attachMedia(videoRef.current);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           setLoading(false);
           videoRef.current.play().catch(() => {});
         });
+        hls.on(Hls.Events.ERROR, (_, d) => {
+          if (d.fatal) setLoading(false);
+        });
         return () => {
           hls.destroy();
+          hlsRef.current = null;
         };
       } else if (
         videoRef.current.canPlayType("application/vnd.apple.mpegurl")
@@ -70,8 +91,10 @@ const LiveStream = () => {
       setTimeout(() => setLoading(false), 600);
     }
   }, [active]);
+
   const wrapperModeClass =
     active?.type === "iframe" ? "iframeTall" : "hlsNormal";
+
   return (
     <section className="live-section">
       <h2 className="section-title">Live Stream</h2>
@@ -83,10 +106,6 @@ const LiveStream = () => {
           {!active ? (
             <div className="stream-placeholder">
               <img src="/serverselect.png" alt="F1 Live Stream" />
-              {/* <div className="placeholder-overlay">
-                <h3>Formula 1 Live Stream</h3>
-                <p>Select a server below to start watching</p>
-              </div> */}
             </div>
           ) : active.type === "hls" ? (
             <video
@@ -110,12 +129,14 @@ const LiveStream = () => {
           )}
           <div className={`click-blocker ${locked ? "active" : ""}`} />
         </div>
+
         <div className="player-controls">
           <p>Unlock player to interact with player</p>
           <button className="lock-toggle" onClick={() => setLocked(!locked)}>
             {locked ? "Unlock Player" : "Lock Player"}
           </button>
         </div>
+
         <div className="server-switch">
           {streamSources.map((s) => (
             <button
@@ -131,9 +152,9 @@ const LiveStream = () => {
             </button>
           ))}
         </div>
-        {/* {loading && <div className="stream-loading">⏳ Loading stream...</div>} */}
       </div>
     </section>
   );
 };
+
 export default LiveStream;
